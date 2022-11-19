@@ -1,11 +1,21 @@
-import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { instanceToPlain } from 'class-transformer';
 import { IUserService } from 'src/users/user';
 import { Routes, Services } from 'src/utils/constants';
 import { IAuthService } from './auth';
 import { CreateUserDto } from './dtos/CreateUser.dto';
-import { UserLoginDto } from './dtos/UserLogin.dto';
-import { LocalAuthGuard } from './utils/Guards';
+import { AuthenticatedGuard, LocalAuthGuard } from './utils/Guards';
+import { Request, Response } from 'express';
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -16,20 +26,24 @@ export class AuthController {
 
   @Post('register')
   registerUser(@Body() createUserDto: CreateUserDto) {
+    console.log(createUserDto.email);
     const user = this.userService.createUser(createUserDto);
 
     return instanceToPlain(user);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
-  login() {
-    console.log('hello from login');
-    return { msg: 'haha' };
+  @UseGuards(LocalAuthGuard)
+  login(@Res() res: Response) {
+    return res.send(HttpStatus.OK);
   }
 
   @Post('logout')
   logout() {}
+
   @Get('status')
-  status() {}
+  @UseGuards(AuthenticatedGuard)
+  status(@Req() req: Request, @Res() res: Response) {
+    res.send(req.user);
+  }
 }
