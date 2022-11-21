@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Inject, Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
-import { IUserService } from 'src/users/user';
+import { IUsersService } from 'src/users/user';
 import { Services } from '../../utils/constants';
 import { User } from '../../utils/typeorm';
 
@@ -9,7 +9,7 @@ import { User } from '../../utils/typeorm';
 export class SessionSerializer extends PassportSerializer {
   constructor(
     @Inject(Services.USERS)
-    private readonly userService: IUserService,
+    private readonly userService: IUsersService,
   ) {
     super();
   }

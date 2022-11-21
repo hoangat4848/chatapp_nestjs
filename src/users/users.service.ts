@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/utils/typeorm';
 import { CreateUserDetails, FindUserParams } from 'src/utils/types';
-import { IUserService } from './user';
+import { IUsersService } from './user';
 import { hashPassword } from 'src/utils/helpers';
 
 @Injectable()
-export class UserService implements IUserService {
+export class UsersService implements IUsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
@@ -29,5 +29,9 @@ export class UserService implements IUserService {
 
   async findUser(findUserParams: FindUserParams) {
     return this.userRepository.findOneBy(findUserParams);
+  }
+
+  async saveUser(user: User): Promise<User> {
+    return this.userRepository.save(user);
   }
 }

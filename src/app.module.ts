@@ -4,15 +4,16 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
-import { ConversationModule } from './conversations/conversations.module';
+import { ConversationsModule } from './conversations/conversations.module';
 import { UsersModule } from './users/users.module';
+import { MessagesModule } from './messages/messages.module';
 import entities from './utils/typeorm';
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
-    ConversationModule,
+    ConversationsModule,
     ConfigModule.forRoot({ envFilePath: '.env.development' }),
     PassportModule.register({ session: true }),
     TypeOrmModule.forRoot({
@@ -25,6 +26,7 @@ import entities from './utils/typeorm';
       entities,
       synchronize: true,
     }),
+    MessagesModule,
   ],
   controllers: [],
   providers: [],

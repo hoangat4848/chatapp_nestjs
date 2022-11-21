@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { IUserService } from 'src/users/user';
+import { IUsersService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
 import { compareHash } from 'src/utils/helpers';
 import { ValidateUsertDetails } from 'src/utils/types';
@@ -8,7 +8,7 @@ import { IAuthService } from './auth';
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
-    @Inject(Services.USERS) private readonly userService: IUserService,
+    @Inject(Services.USERS) private readonly userService: IUsersService,
   ) {}
 
   async validateUser(userCredentials: ValidateUsertDetails) {

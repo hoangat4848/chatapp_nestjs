@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from 'src/users/users.module';
 import { Services } from 'src/utils/constants';
+import { Conversation } from 'src/utils/typeorm';
 import { ConversationsController } from './conversations.controller';
 import { ConversationsService } from './conversations.service';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Conversation]), UsersModule],
   controllers: [ConversationsController],
   providers: [
     {
@@ -12,4 +16,4 @@ import { ConversationsService } from './conversations.service';
     },
   ],
 })
-export class ConversationModule {}
+export class ConversationsModule {}

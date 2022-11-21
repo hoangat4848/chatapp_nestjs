@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
@@ -15,6 +15,7 @@ async function bootstrap() {
   app.enableCors({ origin: ['http://localhost:3000'], credentials: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   // console.log(AppDataSource.options);
   const sessionRepository = app.get(DataSource).getRepository(Session);

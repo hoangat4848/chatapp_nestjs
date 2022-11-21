@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Services } from 'src/utils/constants';
 import { User } from 'src/utils/typeorm';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -10,13 +10,13 @@ import { UserService } from './user.service';
   providers: [
     {
       provide: Services.USERS,
-      useClass: UserService,
+      useClass: UsersService,
     },
   ],
   exports: [
     {
       provide: Services.USERS,
-      useClass: UserService,
+      useClass: UsersService,
     },
   ],
 })
