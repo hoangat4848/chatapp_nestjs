@@ -47,8 +47,11 @@ export class ConversationsService implements IConversationsService {
   }
 
   async findConversationById(id: number): Promise<Conversation> {
-    const conversation = await this.conversationRepository.findOneBy({ id });
-    console.log(conversation);
+    const conversation = await this.conversationRepository.findOne({
+      where: { id },
+      relations: ['creator', 'recipient', 'messages', 'messages.author'],
+    });
+
     return conversation;
   }
 

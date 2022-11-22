@@ -37,7 +37,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   login(@Res() res: Response) {
-    return res.sendStatus(HttpStatus.OK);
+    res.status(HttpStatus.OK).send('ok');
   }
 
   @Post('logout')
@@ -45,10 +45,7 @@ export class AuthController {
 
   @Get('status')
   @UseGuards(AuthenticatedGuard)
-  status(@AuthUser() user: User) {
-    return instanceToPlain(user);
+  async status(@Req() req: Request, @Res() res: Response) {
+    res.send(req.user);
   }
-  // status(@Req() req: Request, @Res() res: Response) {
-  //   return
-  // }
 }

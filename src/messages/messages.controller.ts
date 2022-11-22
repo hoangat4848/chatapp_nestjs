@@ -2,7 +2,9 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Get,
   Inject,
+  Param,
   Post,
   UseGuards,
   UseInterceptors,
@@ -29,5 +31,13 @@ export class MessagesController {
   ) {
     const params = { user, ...createMessageDto };
     return this.messagesService.createMessage(params);
+  }
+
+  @Get(':conversationId')
+  getMessageFromConversation(
+    @AuthUser() user: User,
+    @Param('conversationId') conversationId: number,
+  ) {
+    return this.messagesService.getMessagesByConversationId(conversationId);
   }
 }
