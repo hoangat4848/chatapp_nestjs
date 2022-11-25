@@ -11,6 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import { Message } from 'src/utils/typeorm';
+import { CreateMessageResponse } from 'src/utils/types';
 import { IGatewaySession } from './gateway.session';
 
 @WebSocketGateway({
@@ -41,23 +42,19 @@ export class MessagingGateway implements OnGatewayConnection {
   }
 
   @OnEvent('message.created')
-  handleMessageCreatedEvent(payload: Message) {
+  handleMessageCreatedEvent(payload: CreateMessageResponse) {
     console.log('Inside message.create');
     console.log(payload);
     const {
       author,
       conversation: { creator, recipient },
-    } = payload;
+    } = payload.message;
     const authorSocket = this.sessionsService.getUserSocket(author.id);
 
     const receiver = author.id === creator.id ? recipient : creator;
     const receiverSocket = this.sessionsService.getUserSocket(receiver.id);
 
-    console.log('author>>>', JSON.stringify(authorSocket?.user));
-    console.log('recipient>>>', JSON.stringify(receiverSocket?.user));
     if (authorSocket) authorSocket.emit('onMessage', payload);
     if (receiverSocket) receiverSocket.emit('onMessage', payload);
-
-    // this.server.emit('onMessage', payload);
   }
 }

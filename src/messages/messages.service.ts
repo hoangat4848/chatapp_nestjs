@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { userInfo } from 'os';
 import { Conversation, Message } from 'src/utils/typeorm';
-import { CreateMessageParams } from 'src/utils/types';
+import { CreateMessageParams, CreateMessageResponse } from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IMessagesService } from './messages';
 
@@ -15,11 +15,13 @@ export class MessagesService implements IMessagesService {
     private readonly conversationRepository: Repository<Conversation>,
   ) {}
 
-  async createMessage(params: CreateMessageParams): Promise<Message> {
+  async createMessage(
+    params: CreateMessageParams,
+  ): Promise<CreateMessageResponse> {
     const { user, conversationId, content } = params;
     const conversation = await this.conversationRepository.findOne({
       where: { id: conversationId },
-      relations: ['creator', 'recipient'],
+      relations: ['creator', 'recipient', 'lastMessageSent'],
     });
     if (!conversation)
       throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
@@ -39,11 +41,14 @@ export class MessagesService implements IMessagesService {
       conversation,
       author: user,
     });
-
     const savedMessage = await this.messageRepository.save(newMessage);
+
     conversation.lastMessageSent = savedMessage;
-    await this.conversationRepository.save(conversation);
-    return savedMessage;
+    const updatedConversation = await this.conversationRepository.save(
+      conversation,
+    );
+
+    return { message: savedMessage, conversation: updatedConversation };
   }
 
   async getMessagesByConversationId(

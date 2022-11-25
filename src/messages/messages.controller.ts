@@ -33,8 +33,8 @@ export class MessagesController {
     @Body() createMessageDto: CreateMessageDto,
   ) {
     const params = { user, ...createMessageDto };
-    const newMessage = await this.messagesService.createMessage(params);
-    this.eventEmitter.emit('message.created', newMessage);
+    const response = await this.messagesService.createMessage(params);
+    this.eventEmitter.emit('message.created', response);
     return;
   }
 

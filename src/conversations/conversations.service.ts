@@ -8,7 +8,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { IUsersService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
-import { AuthUser } from 'src/utils/decorators';
 import { Conversation, User } from 'src/utils/typeorm';
 import { CreateConversationParams } from 'src/utils/types';
 import { Repository } from 'typeorm';
@@ -43,7 +42,7 @@ export class ConversationsService implements IConversationsService {
       ])
       .where('creator.id = :id', { id })
       .orWhere('recipient.id = :id', { id })
-      .orderBy('conversation.id', 'DESC')
+      .orderBy('conversation.lastMessageSentAt', 'DESC')
       .getMany();
   }
 
