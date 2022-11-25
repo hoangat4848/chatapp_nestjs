@@ -5,6 +5,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseIntPipe,
   Post,
   UseGuards,
   UseInterceptors,
@@ -38,10 +39,16 @@ export class MessagesController {
   }
 
   @Get(':conversationId')
-  getMessageFromConversation(
+  async getMessageFromConversation(
     @AuthUser() user: User,
-    @Param('conversationId') conversationId: number,
+    @Param('conversationId', ParseIntPipe) conversationId: number,
   ) {
-    return this.messagesService.getMessagesByConversationId(conversationId);
+    const messages = await this.messagesService.getMessagesByConversationId(
+      conversationId,
+    );
+    return {
+      id: conversationId,
+      messages,
+    };
   }
 }

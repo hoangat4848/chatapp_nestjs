@@ -1,4 +1,3 @@
-import { DataSource } from 'typeorm';
 import { User } from './entities/User';
 import { Session } from './entities/Session';
 import { Conversation } from './entities/Conversation';
