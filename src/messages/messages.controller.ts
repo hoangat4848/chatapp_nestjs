@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -15,6 +16,7 @@ import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
+import { DeleteMessageParams } from 'src/utils/types';
 import { CreateMessageDto } from './dtos/CreateMessage.dto';
 import { IMessagesService } from './messages';
 
@@ -30,18 +32,19 @@ export class MessagesController {
   @Post()
   async createMessage(
     @AuthUser() user: User,
-    @Body() createMessageDto: CreateMessageDto,
+    @Param('id', ParseIntPipe) conversationId: number,
+    @Body() { content }: CreateMessageDto,
   ) {
-    const params = { user, ...createMessageDto };
+    const params = { user, conversationId, content };
     const response = await this.messagesService.createMessage(params);
     this.eventEmitter.emit('message.created', response);
-    return;
+    return response.message;
   }
 
-  @Get(':conversationId')
-  async getMessageFromConversation(
+  @Get()
+  async getMessagesFromConversation(
     @AuthUser() user: User,
-    @Param('conversationId', ParseIntPipe) conversationId: number,
+    @Param('id', ParseIntPipe) conversationId: number,
   ) {
     const messages = await this.messagesService.getMessagesByConversationId(
       conversationId,

@@ -2,7 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { userInfo } from 'os';
 import { Conversation, Message } from 'src/utils/typeorm';
-import { CreateMessageParams, CreateMessageResponse } from 'src/utils/types';
+import {
+  CreateMessageParams,
+  CreateMessageResponse,
+  DeleteMessageParams,
+} from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IMessagesService } from './messages';
 
@@ -70,5 +74,9 @@ export class MessagesService implements IMessagesService {
         },
       },
     });
+  }
+
+  async deleteMessage(params: DeleteMessageParams) {
+    return;
   }
 }

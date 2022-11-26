@@ -8,13 +8,10 @@ import {
   Param,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { userInfo } from 'os';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
-import { IUsersService } from 'src/users/user';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
-import { brotliDecompressSync } from 'zlib';
 import { IConversationsService } from './conversations';
 import { CreateConversationDto } from './dtos/CreateConversation.dto';
 
