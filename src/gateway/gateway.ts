@@ -1,6 +1,7 @@
 import { Inject, UseGuards } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   SubscribeMessage,
@@ -8,9 +9,10 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { IConversationsService } from 'src/conversations/conversations';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Message } from 'src/utils/typeorm';
+import { Conversation, Message } from 'src/utils/typeorm';
 import { CreateMessageResponse } from 'src/utils/types';
 import { IGatewaySession } from './gateway.session';
 
@@ -21,24 +23,43 @@ import { IGatewaySession } from './gateway.session';
   },
 })
 export class MessagingGateway implements OnGatewayConnection {
+  @WebSocketServer()
+  server: Server;
+
   constructor(
     @Inject(Services.GATEWAY_SESSION_MANAGER)
     private readonly sessionsService: IGatewaySession,
+    @Inject(Services.CONVERSATIONS)
+    private readonly conversationsService: IConversationsService,
   ) {}
 
   handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
-    // console.log('New incoming request');
-    // socket.emit('connected', { msg: 'hello world' });
+    socket.emit('connected', 'asdsad');
     this.sessionsService.setUserSocket(socket.user.id, socket);
-    // console.dir(this.sessionsService.getSockets());
   }
-
-  @WebSocketServer()
-  server: Server;
 
   @SubscribeMessage('createMessage')
   handleCreateMessage(@MessageBody() data: any) {
     console.log('Create Message');
+  }
+
+  @SubscribeMessage('onClientConnect')
+  handleOnClientConnect(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    // console.log('onClientConnect...');
+    // console.log(data);
+    // console.log(client.user);
+  }
+
+  @SubscribeMessage('onUserTyping')
+  async handleUserTyping(@MessageBody() data: any) {
+    console.log('user is typing');
+    const id = parseInt(data.conversationId);
+    const conversation = await this.conversationsService.findConversationById(
+      id,
+    );
   }
 
   @OnEvent('message.created')
@@ -56,5 +77,13 @@ export class MessagingGateway implements OnGatewayConnection {
 
     if (authorSocket) authorSocket.emit('onMessage', payload);
     if (receiverSocket) receiverSocket.emit('onMessage', payload);
+  }
+
+  @OnEvent('conversation.created')
+  handleConversationCreatedEvent(payload: Conversation) {
+    const receiverSocket = this.sessionsService.getUserSocket(
+      payload.recipient.id,
+    );
+    if (receiverSocket) receiverSocket.emit('onConversation', payload);
   }
 }

@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IMessagesService } from 'src/messages/messages';
 import { IUsersService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
 import { Conversation, User } from 'src/utils/typeorm';
@@ -20,6 +21,8 @@ export class ConversationsService implements IConversationsService {
     private readonly conversationRepository: Repository<Conversation>,
     @Inject(Services.USERS)
     private readonly usersService: IUsersService,
+    @Inject(Services.MESSAGES)
+    private readonly messagesService: IMessagesService,
   ) {}
 
   async getConversations(id: number): Promise<Conversation[]> {
@@ -92,7 +95,18 @@ export class ConversationsService implements IConversationsService {
       creator: user,
       recipient: recipient,
     });
+    const newConversation = await this.conversationRepository.save(
+      conversation,
+    );
 
-    return this.conversationRepository.save(conversation);
+    if (params.message) {
+      const message = await this.messagesService.createMessage({
+        user,
+        content: params.message,
+        conversationId: newConversation.id,
+      });
+    }
+
+    return newConversation;
   }
 }

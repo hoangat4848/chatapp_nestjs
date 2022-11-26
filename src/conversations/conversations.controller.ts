@@ -7,6 +7,7 @@ import {
   Get,
   Param,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { userInfo } from 'os';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { IUsersService } from 'src/users/user';
@@ -23,6 +24,7 @@ export class ConversationsController {
   constructor(
     @Inject(Services.CONVERSATIONS)
     private readonly conversationsService: IConversationsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
@@ -30,10 +32,12 @@ export class ConversationsController {
     @AuthUser() user: User,
     @Body() createConversationDto: CreateConversationDto,
   ) {
-    return this.conversationsService.createConversation(
+    const newConversation = await this.conversationsService.createConversation(
       user,
       createConversationDto,
     );
+    this.eventEmitter.emit('conversation.created', newConversation);
+    return newConversation;
   }
 
   @Get()
