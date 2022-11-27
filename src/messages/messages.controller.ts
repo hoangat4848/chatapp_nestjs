@@ -67,6 +67,11 @@ export class MessagesController {
       messageId,
     };
     await this.messagesService.deleteMessage(params);
-    return 'ok';
+    this.eventEmitter.emit('message.deleted', {
+      userId: user.id,
+      messageId,
+      conversationId,
+    });
+    return { conversationId, messageId };
   }
 }

@@ -62,6 +62,14 @@ export class MessagingGateway implements OnGatewayConnection {
     );
   }
 
+  @OnEvent('conversation.created')
+  handleConversationCreatedEvent(payload: Conversation) {
+    const receiverSocket = this.sessionsService.getUserSocket(
+      payload.recipient.id,
+    );
+    if (receiverSocket) receiverSocket.emit('onConversation', payload);
+  }
+
   @OnEvent('message.created')
   handleMessageCreatedEvent(payload: CreateMessageResponse) {
     console.log('Inside message.create');
@@ -79,11 +87,17 @@ export class MessagingGateway implements OnGatewayConnection {
     if (receiverSocket) receiverSocket.emit('onMessage', payload);
   }
 
-  @OnEvent('conversation.created')
-  handleConversationCreatedEvent(payload: Conversation) {
-    const receiverSocket = this.sessionsService.getUserSocket(
-      payload.recipient.id,
+  @OnEvent('message.deleted')
+  async handleMessageDeletedEvent(payload: any) {
+    const conversation = await this.conversationsService.findConversationById(
+      payload.conversationId,
     );
-    if (receiverSocket) receiverSocket.emit('onConversation', payload);
+    if (!conversation) return;
+    const { creator, recipient } = conversation;
+    const recipientId =
+      payload.userId === creator.id ? recipient.id : creator.id;
+
+    const recipientSocket = this.sessionsService.getUserSocket(recipientId);
+    if (recipientSocket) recipientSocket.emit('onMessageDelete', payload);
   }
 }
