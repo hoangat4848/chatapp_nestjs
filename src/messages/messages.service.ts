@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { userInfo } from 'os';
 import { Conversation, Message } from 'src/utils/typeorm';
 import {
   CreateMessageParams,
@@ -77,6 +76,54 @@ export class MessagesService implements IMessagesService {
   }
 
   async deleteMessage(params: DeleteMessageParams) {
-    return;
+    const { conversationId, userId, messageId } = params;
+
+    const conversation = await this.conversationRepository
+      .createQueryBuilder('conversation')
+      .where('conversation.id = :conversationId', { conversationId })
+      .leftJoinAndSelect('conversation.messages', 'message')
+      .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
+      .orderBy('message.createdAt', 'DESC')
+      .limit(5)
+      .getOne();
+
+    if (!conversation)
+      throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);
+
+    const message = await this.messageRepository.findOne({
+      where: {
+        id: messageId,
+        conversation: { id: conversationId },
+        author: { id: userId },
+      },
+    });
+    if (!message)
+      throw new HttpException('Cannot delete message', HttpStatus.BAD_REQUEST);
+
+    // Deleting last message
+    if (conversation.lastMessageSent.id === message.id) {
+      const SECOND_MESSAGE_INDEX = 1;
+      if (conversation.messages.length <= 1) {
+        await this.conversationRepository.update(
+          { id: conversationId },
+          {
+            lastMessageSent: null,
+            lastMessageSentAt: null,
+          },
+        );
+      } else {
+        const newLastMessage = conversation.messages[SECOND_MESSAGE_INDEX];
+
+        await this.conversationRepository.update(
+          { id: conversationId },
+          {
+            lastMessageSent: newLastMessage,
+            lastMessageSentAt: newLastMessage.createdAt,
+          },
+        );
+      }
+    }
+
+    await this.messageRepository.delete({ id: message.id });
   }
 }
