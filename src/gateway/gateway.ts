@@ -1,4 +1,4 @@
-import { Inject, UseGuards } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
   ConnectedSocket,
@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { IConversationsService } from 'src/conversations/conversations';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Conversation, Message } from 'src/utils/typeorm';
+import { Conversation } from 'src/utils/typeorm';
 import { CreateMessageResponse } from 'src/utils/types';
 import { IGatewaySession } from './gateway.session';
 
@@ -43,23 +43,44 @@ export class MessagingGateway implements OnGatewayConnection {
     console.log('Create Message');
   }
 
-  @SubscribeMessage('onClientConnect')
-  handleOnClientConnect(
+  @SubscribeMessage('onConversationJoin')
+  handleOnConversationJoin(
     @MessageBody() data: any,
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    // console.log('onClientConnect...');
-    // console.log(data);
-    // console.log(client.user);
+    console.log(`${client.id} joined room ${data.conversationId}`);
+    client.join(data.conversationId);
+    client.to(data.conversationId).emit('userJoin');
   }
 
-  @SubscribeMessage('onUserTyping')
-  async handleUserTyping(@MessageBody() data: any) {
+  @SubscribeMessage('onConversationLeave')
+  handleOnConversationLeave(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    console.log(`${client.id} left room ${data.conversationId}`);
+    client.leave(data.conversationId);
+    client.to(data.conversationId).emit('userLeave');
+  }
+
+  @SubscribeMessage('onTypingStart')
+  async handleOnTypingStart(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
     console.log('user is typing');
-    const id = parseInt(data.conversationId);
-    const conversation = await this.conversationsService.findConversationById(
-      id,
-    );
+    console.log(client.rooms);
+    console.log(data.conversationId);
+    client.broadcast.to(data.conversationId).emit('onUserTyping', 'asd');
+  }
+
+  @SubscribeMessage('onTypingStop')
+  async handleOnTypingStop(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    console.log('user stop typing');
+    client.broadcast.to(data.conversationId).emit('onUserStopTyping', 'asd');
   }
 
   @OnEvent('conversation.created')
