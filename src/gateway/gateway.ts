@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { IConversationsService } from 'src/conversations/conversations';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Conversation } from 'src/utils/typeorm';
+import { Conversation, Message } from 'src/utils/typeorm';
 import { CreateMessageResponse } from 'src/utils/types';
 import { IGatewaySession } from './gateway.session';
 
@@ -120,5 +120,18 @@ export class MessagingGateway implements OnGatewayConnection {
 
     const recipientSocket = this.sessionsService.getUserSocket(recipientId);
     if (recipientSocket) recipientSocket.emit('onMessageDelete', payload);
+  }
+
+  @OnEvent('message.updated')
+  async handleMessageUpdatedEvent(payload: Message) {
+    const {
+      author,
+      conversation: { creator, recipient },
+    } = payload;
+
+    const recipientId = author.id === creator.id ? recipient.id : creator.id;
+    const recipientSocket = this.sessionsService.getUserSocket(recipientId);
+
+    if (recipientSocket) recipientSocket.emit('onMessageUpdate', payload);
   }
 }

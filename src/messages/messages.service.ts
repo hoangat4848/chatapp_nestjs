@@ -141,7 +141,10 @@ export class MessagesService implements IMessagesService {
         },
       },
       relations: {
-        conversation: true,
+        conversation: {
+          creator: true,
+          recipient: true,
+        },
         author: true,
       },
     });

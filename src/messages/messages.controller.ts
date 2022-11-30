@@ -92,6 +92,7 @@ export class MessagesController {
       ...editMessageDto,
     };
     const message = await this.messagesService.editMessage(params);
+    this.eventEmitter.emit('message.updated', message);
     return message;
   }
 }
