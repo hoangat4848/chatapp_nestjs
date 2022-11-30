@@ -140,6 +140,10 @@ export class MessagesService implements IMessagesService {
           id: conversationId,
         },
       },
+      relations: {
+        conversation: true,
+        author: true,
+      },
     });
     if (!messageDB)
       throw new HttpException('Cannot Edit Message', HttpStatus.BAD_REQUEST);
