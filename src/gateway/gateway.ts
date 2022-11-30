@@ -71,7 +71,7 @@ export class MessagingGateway implements OnGatewayConnection {
     console.log('user is typing');
     console.log(client.rooms);
     console.log(data.conversationId);
-    client.broadcast.to(data.conversationId).emit('onUserTyping', 'asd');
+    client.broadcast.to(data.conversationId).emit('onUserTyping');
   }
 
   @SubscribeMessage('onTypingStop')
@@ -80,7 +80,7 @@ export class MessagingGateway implements OnGatewayConnection {
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     console.log('user stop typing');
-    client.broadcast.to(data.conversationId).emit('onUserStopTyping', 'asd');
+    client.broadcast.to(data.conversationId).emit('onUserStopTyping');
   }
 
   @OnEvent('conversation.created')

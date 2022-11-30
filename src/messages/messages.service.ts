@@ -5,6 +5,7 @@ import {
   CreateMessageParams,
   CreateMessageResponse,
   DeleteMessageParams,
+  EditMessageParams,
 } from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IMessagesService } from './messages';
@@ -125,5 +126,26 @@ export class MessagesService implements IMessagesService {
     }
 
     await this.messageRepository.delete({ id: message.id });
+  }
+
+  async editMessage(params: EditMessageParams): Promise<Message> {
+    const { conversationId, messageId, userId, content } = params;
+    const messageDB = await this.messageRepository.findOne({
+      where: {
+        id: messageId,
+        author: {
+          id: userId,
+        },
+        conversation: {
+          id: conversationId,
+        },
+      },
+    });
+    if (!messageDB)
+      throw new HttpException('Cannot Edit Message', HttpStatus.BAD_REQUEST);
+
+    messageDB.content = content;
+    const updatedMessage = await this.messageRepository.save(messageDB);
+    return updatedMessage;
   }
 }

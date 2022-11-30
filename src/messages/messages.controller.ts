@@ -1,23 +1,23 @@
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
   Inject,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
-import { DeleteMessageParams } from 'src/utils/types';
+import { DeleteMessageParams, EditMessageParams } from 'src/utils/types';
 import { CreateMessageDto } from './dtos/CreateMessage.dto';
+import { EditMessageDto } from './dtos/EditMessage.dto';
 import { IMessagesService } from './messages';
 
 @Controller(Routes.MESSAGES)
@@ -73,5 +73,25 @@ export class MessagesController {
       conversationId,
     });
     return { conversationId, messageId };
+  }
+
+  // api/conversations/:conversationId/messages/:messageId
+  @Patch(':messageId')
+  async updateMessageFromConversation(
+    @AuthUser() { id: userId }: User,
+    @Param('id', ParseIntPipe) conversationId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+    @Body() editMessageDto: EditMessageDto,
+  ) {
+    console.log('inside patch message route');
+    console.log(`content: ${editMessageDto.content}`);
+    const params: EditMessageParams = {
+      userId,
+      conversationId,
+      messageId,
+      ...editMessageDto,
+    };
+    const message = await this.messagesService.editMessage(params);
+    return message;
   }
 }
