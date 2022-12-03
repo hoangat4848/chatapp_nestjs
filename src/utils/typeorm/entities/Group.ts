@@ -3,7 +3,9 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -12,12 +14,20 @@ import {
 import { Message } from './Message';
 import { User } from './User';
 
-@Entity({ name: 'group_conversations' })
+@Entity({ name: 'groups' })
 export class Group {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  title?: string;
+
+  @ManyToOne(() => User)
+  @JoinColumn()
+  creator: User;
+
   @ManyToMany(() => User, (user) => user.groups)
+  @JoinTable()
   users: User[];
 
   @OneToMany(() => Message, (message) => message.conversation, {
