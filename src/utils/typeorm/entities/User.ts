@@ -3,10 +3,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  JoinColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
+import { Group } from './Group';
 import { Message } from './Message';
 
 @Entity({ name: 'users' })
@@ -29,4 +29,7 @@ export class User {
 
   @OneToMany(() => Message, (message) => message.author)
   messages: Message[];
+
+  @ManyToMany(() => Group, (group) => group.users)
+  groups: Group[];
 }

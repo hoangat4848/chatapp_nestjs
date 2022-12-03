@@ -10,6 +10,7 @@ import entities from './utils/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GatewayModule } from './gateway/gateway.module';
 import { DataSource } from 'typeorm';
+import { GroupsModule } from './groups/groups.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { DataSource } from 'typeorm';
     ConversationsModule,
     MessagesModule,
     GatewayModule,
+    GroupsModule,
   ],
   controllers: [],
   providers: [],
