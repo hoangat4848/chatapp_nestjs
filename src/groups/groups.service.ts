@@ -45,7 +45,7 @@ export class GroupsService implements IGroupsService {
     return groups;
   }
 
-  async getGroupById(id: number): Promise<Group> {
+  async findGroupById(id: number): Promise<Group> {
     const group = await this.groupsRepository.findOne({
       where: {
         id,
@@ -58,5 +58,9 @@ export class GroupsService implements IGroupsService {
     });
 
     return group;
+  }
+
+  async saveGroup(group: Group): Promise<Group> {
+    return this.groupsRepository.save(group);
   }
 }

@@ -23,7 +23,7 @@ export class GroupMessagesController {
   ) {}
 
   @Post()
-  createGroupMessage(
+  async createGroupMessage(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) groupId: number,
     @Body() createGroupMessageDto: CreateMessageDto,
@@ -34,8 +34,8 @@ export class GroupMessagesController {
       ...createGroupMessageDto,
     };
 
-    this.groupMessagesService.createGroupMessage(params);
+    const resp = await this.groupMessagesService.createGroupMessage(params);
 
-    return params;
+    return resp;
   }
 }

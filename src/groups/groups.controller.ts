@@ -46,6 +46,6 @@ export class GroupsController {
 
   @Get(':id')
   getGroup(@AuthUser() user: User, @Param('id', ParseIntPipe) id: number) {
-    return this.groupsService.getGroupById(id);
+    return this.groupsService.findGroupById(id);
   }
 }
