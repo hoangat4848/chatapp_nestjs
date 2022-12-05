@@ -44,4 +44,19 @@ export class GroupsService implements IGroupsService {
 
     return groups;
   }
+
+  async getGroupById(id: number): Promise<Group> {
+    const group = await this.groupsRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        creator: true,
+        users: true,
+        lastMessageSent: true,
+      },
+    });
+
+    return group;
+  }
 }
