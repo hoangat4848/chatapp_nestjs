@@ -1,4 +1,4 @@
-import { Conversation, Message, User } from './typeorm';
+import { Conversation, Group, GroupMessage, Message, User } from './typeorm';
 
 export type CreateUserDetails = {
   email: string;
@@ -63,4 +63,9 @@ export type CreateGroupMessageParams = {
   author: User;
   groupId: number;
   content: string;
+};
+
+export type CreateGroupMessageResponse = {
+  message: GroupMessage;
+  group: Group;
 };

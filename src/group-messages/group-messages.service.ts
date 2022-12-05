@@ -40,6 +40,6 @@ export class GroupMessagesService implements IGroupMessagesService {
     // group.lastMessageSentAt = savedMessage.createdAt;
     const updatedGroup = await this.groupService.saveGroup(group);
 
-    return updatedGroup;
+    return { message: savedMessage, group: updatedGroup };
   }
 }
