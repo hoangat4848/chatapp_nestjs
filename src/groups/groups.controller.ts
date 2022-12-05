@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
+import { CreateMessageDto } from 'src/messages/dtos/CreateMessage.dto';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';

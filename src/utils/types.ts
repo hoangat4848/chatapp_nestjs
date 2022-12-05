@@ -58,3 +58,9 @@ export type CreateGroupParams = {
 export type FetchGroupParams = {
   userId: number;
 };
+
+export type CreateGroupMessageParams = {
+  author: User;
+  groupId: number;
+  content: string;
+};
