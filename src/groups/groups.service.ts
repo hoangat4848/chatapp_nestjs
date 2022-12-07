@@ -41,6 +41,7 @@ export class GroupsService implements IGroupsService {
       .innerJoinAndSelect('groups.users', 'user')
       .where('user.id IN(:id)', { id: userId })
       .leftJoinAndSelect('groups.lastMessageSent', 'lastMessageSent')
+      .orderBy('groups.lastMessageSentAt', 'DESC')
       .getMany();
 
     return groups;
