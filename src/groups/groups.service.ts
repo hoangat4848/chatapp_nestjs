@@ -40,6 +40,7 @@ export class GroupsService implements IGroupsService {
       .createQueryBuilder('groups')
       .innerJoinAndSelect('groups.users', 'user')
       .where('user.id IN(:id)', { id: userId })
+      .leftJoinAndSelect('groups.lastMessageSent', 'lastMessageSent')
       .getMany();
 
     return groups;

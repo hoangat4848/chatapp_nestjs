@@ -4,7 +4,10 @@ import { instanceToPlain } from 'class-transformer';
 import { IGroupsService } from 'src/groups/groups';
 import { Services } from 'src/utils/constants';
 import { GroupMessage } from 'src/utils/typeorm';
-import { CreateGroupMessageParams } from 'src/utils/types';
+import {
+  CreateGroupMessageParams,
+  GetGroupMessagesParams,
+} from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IGroupMessagesService } from './group-messages';
 
@@ -41,5 +44,36 @@ export class GroupMessagesService implements IGroupMessagesService {
     const updatedGroup = await this.groupService.saveGroup(group);
 
     return { message: savedMessage, group: updatedGroup };
+  }
+
+  async getGroupMessages(
+    params: GetGroupMessagesParams,
+  ): Promise<GroupMessage[]> {
+    const { userId, groupId } = params;
+    const group = await this.groupService.findGroupById(groupId);
+    if (!group)
+      throw new HttpException('No Group Found', HttpStatus.BAD_REQUEST);
+    const userIndex = group.users.findIndex((user) => user.id === userId);
+    if (userIndex < 0)
+      throw new HttpException('User Not In Group', HttpStatus.BAD_REQUEST);
+
+    return this.groupMessageRepository.find({
+      where: {
+        group: { id: group.id },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: {
+        author: true,
+      },
+      select: {
+        author: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    });
   }
 }

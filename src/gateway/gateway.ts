@@ -13,7 +13,10 @@ import { IConversationsService } from 'src/conversations/conversations';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import { Conversation, Message } from 'src/utils/typeorm';
-import { CreateMessageResponse } from 'src/utils/types';
+import {
+  CreateGroupMessageResponse,
+  CreateMessageResponse,
+} from 'src/utils/types';
 import { IGatewaySession } from './gateway.session';
 
 @WebSocketGateway({
@@ -48,9 +51,12 @@ export class MessagingGateway implements OnGatewayConnection {
     @MessageBody() data: any,
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    console.log(`${client.id} joined room ${data.conversationId}`);
-    client.join(data.conversationId);
-    client.to(data.conversationId).emit('userJoin');
+    console.log(
+      `${client.id} joined room ${`conversation-${data.conversationId}`}`,
+    );
+    client.join(`conversation-${data.conversationId}`);
+    console.log(client.rooms);
+    client.to(`conversation-${data.conversationId}`).emit('userJoin');
   }
 
   @SubscribeMessage('onConversationLeave')
@@ -58,9 +64,34 @@ export class MessagingGateway implements OnGatewayConnection {
     @MessageBody() data: any,
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    console.log(`${client.id} left room ${data.conversationId}`);
-    client.leave(data.conversationId);
-    client.to(data.conversationId).emit('userLeave');
+    console.log(
+      `${client.id} left room ${`conversation-${data.conversationId}`}`,
+    );
+    client.leave(`conversation-${data.conversationId}`);
+    console.log(client.rooms);
+    client.to(`conversation-${data.conversationId}`).emit('userLeave');
+  }
+
+  @SubscribeMessage('onGroupJoin')
+  handleOnGroupJoin(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    console.log(`${client.id} joined room ${`group-${data.groupId}`}`);
+    client.join(`group-${data.groupId}`);
+    console.log(client.rooms);
+    client.to(`group-${data.groupId}`).emit('userJoinGroup');
+  }
+
+  @SubscribeMessage('onGroupLeave')
+  handleOnGroupLeave(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    console.log(`${client.id} left room ${`group-${data.groupId}`}`);
+    client.leave(`group-${data.groupId}`);
+    console.log(client.rooms);
+    client.to(`group-${data.groupId}`).emit('userLeaveGroup');
   }
 
   @SubscribeMessage('onTypingStart')
@@ -70,7 +101,6 @@ export class MessagingGateway implements OnGatewayConnection {
   ) {
     console.log('user is typing');
     console.log(client.rooms);
-    console.log(data.conversationId);
     client.broadcast.to(data.conversationId).emit('onUserTyping');
   }
 
@@ -133,5 +163,17 @@ export class MessagingGateway implements OnGatewayConnection {
     const recipientSocket = this.sessionsService.getUserSocket(recipientId);
 
     if (recipientSocket) recipientSocket.emit('onMessageUpdate', payload);
+  }
+
+  @OnEvent('group.message.created')
+  async handleGroupMessageCreated(payload: CreateGroupMessageResponse) {
+    const { group } = payload;
+    const userIds = group.users.map((user) => user.id);
+    const sockets = userIds.map((userId) =>
+      this.sessionsService.getUserSocket(userId),
+    );
+    sockets.forEach(
+      (socket) => socket && socket.emit('onGroupMessage', payload),
+    );
   }
 }
