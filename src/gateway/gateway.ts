@@ -4,6 +4,7 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -25,7 +26,9 @@ import { IGatewaySession } from './gateway.session';
     credentials: true,
   },
 })
-export class MessagingGateway implements OnGatewayConnection {
+export class MessagingGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -39,6 +42,10 @@ export class MessagingGateway implements OnGatewayConnection {
   handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
     socket.emit('connected', 'asdsad');
     this.sessionsService.setUserSocket(socket.user.id, socket);
+  }
+
+  handleDisconnect(client: any) {
+    console.log(`Client ${client} disconnected`);
   }
 
   @SubscribeMessage('createMessage')
@@ -129,6 +136,7 @@ export class MessagingGateway implements OnGatewayConnection {
       author,
       conversation: { creator, recipient },
     } = payload.message;
+
     const authorSocket = this.sessionsService.getUserSocket(author.id);
 
     const receiver = author.id === creator.id ? recipient : creator;

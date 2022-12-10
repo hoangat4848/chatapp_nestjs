@@ -34,4 +34,14 @@ export class UsersService implements IUsersService {
   async saveUser(user: User): Promise<User> {
     return this.userRepository.save(user);
   }
+
+  async searchUsers(query: string): Promise<User[]> {
+    const searchStatement = '(user.email LIKE :query)';
+    return this.userRepository
+      .createQueryBuilder('user')
+      .where(searchStatement, { query: `%${query}%` })
+      .limit(10)
+      .select(['user.id', 'user.firstName', 'user.lastName', 'user.email'])
+      .getMany();
+  }
 }
