@@ -25,7 +25,6 @@ export class GroupsService implements IGroupsService {
       (user) => user && user.id !== creator.id,
     );
     usersDB.push(creator);
-    console.log(usersDB);
     const group = this.groupsRepository.create({
       users: usersDB,
       creator,

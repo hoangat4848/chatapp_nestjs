@@ -108,7 +108,9 @@ export class MessagingGateway
   ) {
     console.log('user is typing');
     console.log(client.rooms);
-    client.broadcast.to(data.conversationId).emit('onUserTyping');
+    client.broadcast
+      .to(`conversation-${data.conversationId}`)
+      .emit('onUserTyping');
   }
 
   @SubscribeMessage('onTypingStop')
@@ -117,7 +119,9 @@ export class MessagingGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     console.log('user stop typing');
-    client.broadcast.to(data.conversationId).emit('onUserStopTyping');
+    client.broadcast
+      .to(`conversation-${data.conversationId}`)
+      .emit('onUserStopTyping');
   }
 
   @OnEvent('conversation.created')
