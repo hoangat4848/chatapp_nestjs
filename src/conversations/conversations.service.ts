@@ -95,12 +95,13 @@ export class ConversationsService implements IConversationsService {
       creator: user,
       recipient: recipient,
     });
+
     const newConversation = await this.conversationRepository.save(
       conversation,
     );
 
     if (params.message) {
-      const message = await this.messagesService.createMessage({
+      const { message } = await this.messagesService.createMessage({
         user,
         content: params.message,
         conversationId: newConversation.id,

@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { IConversationsService } from 'src/conversations/conversations';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Conversation, Message } from 'src/utils/typeorm';
+import { Conversation, Group, Message } from 'src/utils/typeorm';
 import {
   CreateGroupMessageResponse,
   CreateMessageResponse,
@@ -187,5 +187,17 @@ export class MessagingGateway
     sockets.forEach(
       (socket) => socket && socket.emit('onGroupMessage', payload),
     );
+  }
+
+  @OnEvent('group.created')
+  async handleGroupCreated(payload: Group) {
+    console.log('inside handleGroupCreated');
+    const sockets: AuthenticatedSocket[] = [];
+    payload.users.forEach((user) => {
+      const socket = this.sessionsService.getUserSocket(user.id);
+      socket && socket.emit('onGroupCreate', payload);
+    });
+    console.log(sockets);
+    // sockets.forEach((socket) => socket.emit('onGroupCreated', payload));
   }
 }

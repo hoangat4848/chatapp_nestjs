@@ -8,6 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { CreateMessageDto } from 'src/messages/dtos/CreateMessage.dto';
 import { Routes, Services } from 'src/utils/constants';
@@ -23,6 +24,7 @@ export class GroupsController {
   constructor(
     @Inject(Services.GROUPS)
     private readonly groupsService: IGroupsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
@@ -32,7 +34,8 @@ export class GroupsController {
       ...payload,
     };
 
-    const group = this.groupsService.createGroup(params);
+    const group = await this.groupsService.createGroup(params);
+    this.eventEmitter.emit('group.created', group);
     return group;
   }
 
