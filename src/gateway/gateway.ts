@@ -17,6 +17,8 @@ import { Conversation, Group, Message } from 'src/utils/typeorm';
 import {
   CreateGroupMessageResponse,
   CreateMessageResponse,
+  DeleteGroupMessageResponse,
+  DeleteMessageReponse,
 } from 'src/utils/types';
 import { IGatewaySession } from './gateway.session';
 
@@ -151,7 +153,7 @@ export class MessagingGateway
   }
 
   @OnEvent('message.deleted')
-  async handleMessageDeletedEvent(payload: any) {
+  async handleMessageDeletedEvent(payload: DeleteMessageReponse) {
     const conversation = await this.conversationsService.findConversationById(
       payload.conversationId,
     );
@@ -197,7 +199,8 @@ export class MessagingGateway
       const socket = this.sessionsService.getUserSocket(user.id);
       socket && socket.emit('onGroupCreate', payload);
     });
-    console.log(sockets);
-    // sockets.forEach((socket) => socket.emit('onGroupCreated', payload));
   }
+
+  @OnEvent('group.message.deleted')
+  async handleGroupMessageDeleted(payload: DeleteGroupMessageResponse) {}
 }

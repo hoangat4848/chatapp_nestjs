@@ -42,6 +42,12 @@ export type DeleteMessageParams = {
   messageId: number;
 };
 
+export type DeleteMessageReponse = {
+  userId: number;
+  conversationId: number;
+  messageId: number;
+};
+
 export type EditMessageParams = {
   conversationId: number;
   messageId: number;
@@ -73,4 +79,16 @@ export type CreateGroupMessageResponse = {
 export type GetGroupMessagesParams = {
   userId: number;
   groupId: number;
+};
+
+export type DeleteGroupMessageParams = {
+  userId: number;
+  groupId: number;
+  messageId: number;
+};
+
+export type DeleteGroupMessageResponse = {
+  userId: number;
+  groupId: number;
+  messageId: number;
 };

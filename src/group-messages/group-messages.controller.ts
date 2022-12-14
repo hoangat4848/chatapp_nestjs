@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -14,6 +15,7 @@ import { CreateMessageDto } from 'src/messages/dtos/CreateMessage.dto';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
+import { DeleteGroupMessageParams } from 'src/utils/types';
 import { IGroupMessagesService } from './group-messages';
 
 @Controller(Routes.GROUP_MESSAGES)
@@ -57,5 +59,27 @@ export class GroupMessagesController {
       id: groupId,
       messages,
     };
+  }
+
+  @Delete(':messageId')
+  async deleteGroupMessage(
+    @AuthUser() user: User,
+    @Param('id', ParseIntPipe) groupId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+  ) {
+    const params: DeleteGroupMessageParams = {
+      userId: user.id,
+      groupId,
+      messageId,
+    };
+    await this.groupMessagesService.deleteGroupMessage(params);
+
+    this.eventEmitter.emit('group.message.deleted', {
+      userId: user.id,
+      messageId,
+      groupId,
+    });
+
+    return { groupId, messageId };
   }
 }
