@@ -12,6 +12,7 @@ import {
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { Server, Socket } from 'socket.io';
 import { IConversationsService } from 'src/conversations/conversations';
+import { IGroupsService } from 'src/groups/groups';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import { Conversation, Group, GroupMessage, Message } from 'src/utils/typeorm';
@@ -40,6 +41,8 @@ export class MessagingGateway
     private readonly sessionsService: IGatewaySession,
     @Inject(Services.CONVERSATIONS)
     private readonly conversationsService: IConversationsService,
+    @Inject(Services.GROUPS)
+    private readonly groupsService: IGroupsService,
   ) {}
 
   handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
@@ -47,8 +50,34 @@ export class MessagingGateway
     this.sessionsService.setUserSocket(socket.user.id, socket);
   }
 
-  handleDisconnect(client: any) {
-    console.log(`Client ${client} disconnected`);
+  handleDisconnect(socket: AuthenticatedSocket) {
+    console.log('handleDisconnect');
+    console.log(`${socket.user.email} disconnected.`);
+    this.sessionsService.removeUserSocket(socket.user.id);
+  }
+
+  @SubscribeMessage('getOnlineGroupUsers')
+  async handleGetOnlineGroupUsers(
+    @MessageBody() data: { groupId: number },
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('handle...');
+    console.log(data);
+    const clientsInRoom = this.server.sockets.adapter.rooms.get(
+      `group-${data.groupId}`,
+    );
+    const group = await this.groupsService.findGroupById(data.groupId);
+    if (!group) return;
+    const onlineUsers = [];
+    const offlineUsers = [];
+    group.users.forEach((user) => {
+      const socket = this.sessionsService.getUserSocket(user.id);
+      socket ? onlineUsers.push(user) : offlineUsers.push(user);
+    });
+
+    console.log(onlineUsers);
+    console.log(offlineUsers);
+    socket.emit('onlineGroupUsersReceived', { onlineUsers, offlineUsers });
   }
 
   @SubscribeMessage('createMessage')
