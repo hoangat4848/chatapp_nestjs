@@ -9,6 +9,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { Server, Socket } from 'socket.io';
 import { IConversationsService } from 'src/conversations/conversations';
 import { Services } from 'src/utils/constants';
@@ -205,10 +206,13 @@ export class MessagingGateway
 
   @OnEvent('group.message.updated')
   async handleGroupMessageUpdated(payload: GroupMessage) {
-    // const sockets: AuthenticatedSocket[] = [];
-    // payload.group.users.forEach((user) => {
-    //   const socket = this.sessionsService.getUserSocket(user.id);
-    //   socket && socket.emit('onGroupCreate', payload);
-    // });
+    console.log('inside handle group message updated');
+
+    const room = `group-${payload.group.id}`;
+    console.log(room);
+
+    this.server
+      .to(room)
+      .emit('onGroupMessageUpdate', plainToInstance(GroupMessage, payload));
   }
 }
