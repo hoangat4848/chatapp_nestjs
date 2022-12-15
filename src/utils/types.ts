@@ -92,3 +92,10 @@ export type DeleteGroupMessageResponse = {
   groupId: number;
   messageId: number;
 };
+
+export type EditGroupMessageParams = {
+  userId: number;
+  groupId: number;
+  messageId: number;
+  content: string;
+};

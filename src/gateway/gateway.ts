@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { IConversationsService } from 'src/conversations/conversations';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Conversation, Group, Message } from 'src/utils/typeorm';
+import { Conversation, Group, GroupMessage, Message } from 'src/utils/typeorm';
 import {
   CreateGroupMessageResponse,
   CreateMessageResponse,
@@ -193,7 +193,6 @@ export class MessagingGateway
 
   @OnEvent('group.created')
   async handleGroupCreated(payload: Group) {
-    console.log('inside handleGroupCreated');
     const sockets: AuthenticatedSocket[] = [];
     payload.users.forEach((user) => {
       const socket = this.sessionsService.getUserSocket(user.id);
@@ -203,4 +202,13 @@ export class MessagingGateway
 
   @OnEvent('group.message.deleted')
   async handleGroupMessageDeleted(payload: DeleteGroupMessageResponse) {}
+
+  @OnEvent('group.message.updated')
+  async handleGroupMessageUpdated(payload: GroupMessage) {
+    // const sockets: AuthenticatedSocket[] = [];
+    // payload.group.users.forEach((user) => {
+    //   const socket = this.sessionsService.getUserSocket(user.id);
+    //   socket && socket.emit('onGroupCreate', payload);
+    // });
+  }
 }

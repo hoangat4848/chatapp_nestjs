@@ -9,13 +9,18 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { Patch } from '@nestjs/common/decorators';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { CreateMessageDto } from 'src/messages/dtos/CreateMessage.dto';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
-import { DeleteGroupMessageParams } from 'src/utils/types';
+import {
+  DeleteGroupMessageParams,
+  EditGroupMessageParams,
+} from 'src/utils/types';
+import { EditGroupMessageDto } from './dtos/EditGroupMessage.dto';
 import { IGroupMessagesService } from './group-messages';
 
 @Controller(Routes.GROUP_MESSAGES)
@@ -81,5 +86,25 @@ export class GroupMessagesController {
     });
 
     return { groupId, messageId };
+  }
+
+  @Patch(':messageId')
+  async updateGroupMessage(
+    @AuthUser() { id: userId }: User,
+    @Param('id', ParseIntPipe) groupId: number,
+    @Param('messageId', ParseIntPipe) messageId: number,
+    @Body() editMessageDto: EditGroupMessageDto,
+  ) {
+    const params: EditGroupMessageParams = {
+      userId,
+      groupId,
+      messageId,
+      ...editMessageDto,
+    };
+    const groupMessage = await this.groupMessagesService.editGroupMessage(
+      params,
+    );
+    this.eventEmitter.emit('group.message.updated', groupMessage);
+    return groupMessage;
   }
 }

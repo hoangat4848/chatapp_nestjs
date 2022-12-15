@@ -7,6 +7,7 @@ import { Group, GroupMessage } from 'src/utils/typeorm';
 import {
   CreateGroupMessageParams,
   DeleteGroupMessageParams,
+  EditGroupMessageParams,
   GetGroupMessagesParams,
 } from 'src/utils/types';
 import { Repository } from 'typeorm';
@@ -28,7 +29,7 @@ export class GroupMessagesService implements IGroupMessagesService {
 
     const group = await this.groupService.findGroupById(groupId);
     if (!group)
-      throw new HttpException('No Group Found', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Group Not Found', HttpStatus.BAD_REQUEST);
     const findUser = group.users.find((user) => user.id === author.id);
     if (!findUser)
       throw new HttpException('User Not In Group', HttpStatus.BAD_REQUEST);
@@ -55,7 +56,7 @@ export class GroupMessagesService implements IGroupMessagesService {
     const { userId, groupId } = params;
     const group = await this.groupService.findGroupById(groupId);
     if (!group)
-      throw new HttpException('No Group Found', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Group Not Found', HttpStatus.BAD_REQUEST);
     const userIndex = group.users.findIndex((user) => user.id === userId);
     if (userIndex < 0)
       throw new HttpException('User Not In Group', HttpStatus.BAD_REQUEST);
@@ -94,7 +95,7 @@ export class GroupMessagesService implements IGroupMessagesService {
     if (!group)
       throw new HttpException('Group not found', HttpStatus.BAD_REQUEST);
 
-    const message = await this.groupMessageRepository.findOne({
+    const groupMessage = await this.groupMessageRepository.findOne({
       where: {
         id: messageId,
         author: {
@@ -105,10 +106,10 @@ export class GroupMessagesService implements IGroupMessagesService {
         },
       },
     });
-    if (!message)
+    if (!groupMessage)
       throw new HttpException('Cannot delete message', HttpStatus.BAD_REQUEST);
 
-    if (group.lastMessageSent.id === message.id) {
+    if (group.lastMessageSent.id === groupMessage.id) {
       const SECOND_MESSAGE_INDEX = 1;
       if (group.messages.length <= 1) {
         await this.groupRepository.update(
@@ -131,6 +132,35 @@ export class GroupMessagesService implements IGroupMessagesService {
       }
     }
 
-    await this.groupMessageRepository.delete({ id: message.id });
+    await this.groupMessageRepository.delete({ id: groupMessage.id });
+  }
+
+  async editGroupMessage(
+    params: EditGroupMessageParams,
+  ): Promise<GroupMessage> {
+    const { userId, groupId, messageId, content } = params;
+    const group = await this.groupService.findGroupById(groupId);
+    if (!group)
+      throw new HttpException('Group Not Found', HttpStatus.BAD_REQUEST);
+
+    const groupMessage = await this.groupMessageRepository.findOne({
+      where: {
+        id: messageId,
+        author: { id: userId },
+        group: { id: groupId },
+      },
+      relations: {
+        group: {
+          users: true,
+        },
+        author: true,
+      },
+    });
+    if (!groupMessage)
+      throw new HttpException('Cannot update message', HttpStatus.BAD_REQUEST);
+
+    groupMessage.content = content;
+    const updatedGroupMessage = this.groupMessageRepository.save(groupMessage);
+    return updatedGroupMessage;
   }
 }

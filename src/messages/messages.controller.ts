@@ -75,7 +75,6 @@ export class MessagesController {
     return { conversationId, messageId };
   }
 
-  // api/conversations/:conversationId/messages/:messageId
   @Patch(':messageId')
   async updateMessageFromConversation(
     @AuthUser() { id: userId }: User,
@@ -83,8 +82,6 @@ export class MessagesController {
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() editMessageDto: EditMessageDto,
   ) {
-    console.log('inside patch message route');
-    console.log(`content: ${editMessageDto.content}`);
     const params: EditMessageParams = {
       userId,
       conversationId,
