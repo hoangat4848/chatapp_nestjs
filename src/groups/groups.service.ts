@@ -37,8 +37,9 @@ export class GroupsService implements IGroupsService {
   async getGroups({ userId }: FetchGroupParams): Promise<Group[]> {
     const groups = await this.groupsRepository
       .createQueryBuilder('groups')
-      .innerJoinAndSelect('groups.users', 'user')
-      .where('user.id IN(:id)', { id: userId })
+      .leftJoinAndSelect('groups.users', 'user')
+      .where('user.id = :id', { id: userId })
+      .leftJoinAndSelect('groups.users', 'users')
       .leftJoinAndSelect('groups.lastMessageSent', 'lastMessageSent')
       .orderBy('groups.lastMessageSentAt', 'DESC')
       .getMany();
