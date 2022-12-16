@@ -28,6 +28,7 @@ import { APP_GUARD } from '@nestjs/core';
       database: process.env.MYSQL_DB_DATABASE,
       entities,
       synchronize: true,
+      logging: true,
     }),
     ThrottlerModule.forRoot({
       ttl: 60,

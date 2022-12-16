@@ -1,5 +1,10 @@
-import { AddGroupRecipientParams } from 'src/utils/types';
+import { Group } from 'src/utils/typeorm';
+import {
+  AddGroupRecipientParams,
+  RemoveGroupRecipientParams,
+} from 'src/utils/types';
 
 export interface IGroupRecipientsService {
-  addGroupRecipient(params: AddGroupRecipientParams);
+  addGroupRecipient(params: AddGroupRecipientParams): Promise<Group>;
+  removeGroupRecipient(params: RemoveGroupRecipientParams): Promise<Group>;
 }

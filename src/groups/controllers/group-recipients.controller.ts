@@ -1,4 +1,4 @@
-import { Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Inject, Post, UseGuards } from '@nestjs/common';
 import {
   Body,
   Param,
@@ -8,7 +8,10 @@ import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
-import { AddGroupRecipientParams } from 'src/utils/types';
+import {
+  AddGroupRecipientParams,
+  RemoveGroupRecipientParams,
+} from 'src/utils/types';
 import { AddGroupRecipientDto } from '../dtos/AddGroupRecipient.dto';
 import { IGroupRecipientsService } from '../interfaces/group-recipients';
 
@@ -22,11 +25,25 @@ export class GroupRecipientsController {
 
   @Post()
   async addGroupRecipient(
-    @AuthUser() { id: userId }: User,
+    @AuthUser() { id: issuerId }: User,
     @Param('id', ParseIntPipe) groupId: number,
     @Body() { email }: AddGroupRecipientDto,
   ) {
-    const params: AddGroupRecipientParams = { userId, groupId, email };
+    const params: AddGroupRecipientParams = { issuerId, groupId, email };
     return this.groupRecipientsService.addGroupRecipient(params);
+  }
+
+  @Delete(':userId')
+  async removeGroupRecipient(
+    @AuthUser() { id: issuerId }: User,
+    @Param('id', ParseIntPipe) groupId: number,
+    @Param('userId', ParseIntPipe) removeUserId: number,
+  ) {
+    const params: RemoveGroupRecipientParams = {
+      issuerId,
+      groupId,
+      removeUserId,
+    };
+    return this.groupRecipientsService.removeGroupRecipient(params);
   }
 }

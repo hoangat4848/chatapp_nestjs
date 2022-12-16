@@ -101,7 +101,13 @@ export type EditGroupMessageParams = {
 };
 
 export type AddGroupRecipientParams = {
-  userId: number;
+  issuerId: number;
   groupId: number;
   email: string;
+};
+
+export type RemoveGroupRecipientParams = {
+  issuerId: number;
+  groupId: number;
+  removeUserId: number;
 };
