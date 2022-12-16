@@ -4,6 +4,7 @@ import {
   Param,
 } from '@nestjs/common/decorators/http/route-params.decorator';
 import { ParseIntPipe } from '@nestjs/common/pipes/parse-int.pipe';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -21,6 +22,7 @@ export class GroupRecipientsController {
   constructor(
     @Inject(Services.GROUP_RECIPIENTS)
     private readonly groupRecipientsService: IGroupRecipientsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
@@ -30,7 +32,11 @@ export class GroupRecipientsController {
     @Body() { email }: AddGroupRecipientDto,
   ) {
     const params: AddGroupRecipientParams = { issuerId, groupId, email };
-    return this.groupRecipientsService.addGroupRecipient(params);
+    const response = await this.groupRecipientsService.addGroupRecipient(
+      params,
+    );
+    this.eventEmitter.emit('group.user.added', response);
+    return response;
   }
 
   @Delete(':userId')

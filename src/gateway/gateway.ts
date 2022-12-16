@@ -17,6 +17,7 @@ import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import { Conversation, Group, GroupMessage, Message } from 'src/utils/typeorm';
 import {
+  AddGroupUserReponse,
   CreateGroupMessageResponse,
   CreateMessageResponse,
   DeleteGroupMessageResponse,
@@ -241,5 +242,12 @@ export class MessagingGateway
     this.server
       .to(room)
       .emit('onGroupMessageUpdate', plainToInstance(GroupMessage, payload));
+  }
+
+  @OnEvent('group.user.added')
+  async handleGroupUserAdded(payload: AddGroupUserReponse) {
+    const { group, user } = payload;
+    const recipientSocket = this.sessionsService.getUserSocket(user.id);
+    if (recipientSocket) recipientSocket.emit('onGroupUserAdd', payload);
   }
 }

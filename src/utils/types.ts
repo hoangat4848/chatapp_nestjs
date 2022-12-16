@@ -106,6 +106,11 @@ export type AddGroupRecipientParams = {
   email: string;
 };
 
+export type AddGroupUserReponse = {
+  group: Group;
+  user: User;
+};
+
 export type RemoveGroupRecipientParams = {
   issuerId: number;
   groupId: number;

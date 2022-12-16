@@ -40,7 +40,8 @@ export class GroupRecipientsService implements IGroupRecipientsService {
       throw new HttpException('User already in group', HttpStatus.BAD_REQUEST);
     group.users = [...group.users, recipient];
 
-    return this.groupsService.saveGroup(group);
+    const savedGroup = await this.groupsService.saveGroup(group);
+    return { group: savedGroup, user: recipient };
   }
 
   async removeGroupRecipient(
