@@ -12,6 +12,8 @@ import { GatewayModule } from './gateway/gateway.module';
 import { DataSource } from 'typeorm';
 import { GroupsModule } from './groups/groups.module';
 import { GroupMessagesModule } from './group-messages/group-messages.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -28,6 +30,10 @@ import { GroupMessagesModule } from './group-messages/group-messages.module';
       entities,
       synchronize: true,
     }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
     AuthModule,
     UsersModule,
     ConversationsModule,
@@ -37,7 +43,12 @@ import { GroupMessagesModule } from './group-messages/group-messages.module';
     GroupMessagesModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}

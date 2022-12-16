@@ -166,8 +166,6 @@ export class MessagingGateway
 
   @OnEvent('message.created')
   handleMessageCreatedEvent(payload: CreateMessageResponse) {
-    console.log('Inside message.create');
-    console.log(payload);
     const {
       author,
       conversation: { creator, recipient },

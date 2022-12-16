@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { Throttle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -29,6 +30,7 @@ export class MessagesController {
     private eventEmitter: EventEmitter2,
   ) {}
 
+  @Throttle(2, 10)
   @Post()
   async createMessage(
     @AuthUser() user: User,
@@ -41,6 +43,7 @@ export class MessagesController {
     return response.message;
   }
 
+  @Throttle(2, 10)
   @Get()
   async getMessagesFromConversation(
     @AuthUser() user: User,
