@@ -248,6 +248,7 @@ export class MessagingGateway
   async handleGroupUserAdded(payload: AddGroupUserReponse) {
     const { group, user } = payload;
     const recipientSocket = this.sessionsService.getUserSocket(user.id);
-    if (recipientSocket) recipientSocket.emit('onGroupUserAdd', payload);
+    if (recipientSocket)
+      recipientSocket.emit('onGroupUserAdd', plainToInstance(Group, group));
   }
 }
