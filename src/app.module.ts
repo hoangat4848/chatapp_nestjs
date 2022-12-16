@@ -11,7 +11,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GatewayModule } from './gateway/gateway.module';
 import { DataSource } from 'typeorm';
 import { GroupsModule } from './groups/groups.module';
-import { GroupMessagesModule } from './group-messages/group-messages.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -40,7 +39,6 @@ import { APP_GUARD } from '@nestjs/core';
     MessagesModule,
     GatewayModule,
     GroupsModule,
-    GroupMessagesModule,
   ],
   controllers: [],
   providers: [

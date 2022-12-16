@@ -20,8 +20,8 @@ import {
   DeleteGroupMessageParams,
   EditGroupMessageParams,
 } from 'src/utils/types';
-import { EditGroupMessageDto } from './dtos/EditGroupMessage.dto';
-import { IGroupMessagesService } from './group-messages';
+import { EditGroupMessageDto } from '../dtos/EditGroupMessage.dto';
+import { IGroupMessagesService } from '../interfaces/group-messages';
 
 @Controller(Routes.GROUP_MESSAGES)
 @UseGuards(AuthenticatedGuard)

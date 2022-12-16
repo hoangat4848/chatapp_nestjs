@@ -10,13 +10,12 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
-import { CreateMessageDto } from 'src/messages/dtos/CreateMessage.dto';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import { CreateGroupParams, FetchGroupParams } from 'src/utils/types';
-import { CreateGroupDto } from './dtos/CreateGroup.dto';
-import { IGroupsService } from './groups';
+import { CreateGroupDto } from '../dtos/CreateGroup.dto';
+import { IGroupsService } from '../interfaces/groups';
 
 @UseGuards(AuthenticatedGuard)
 @Controller(Routes.GROUPS)

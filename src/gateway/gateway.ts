@@ -9,10 +9,10 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { plainToClass, plainToInstance } from 'class-transformer';
-import { Server, Socket } from 'socket.io';
+import { plainToInstance } from 'class-transformer';
+import { Server } from 'socket.io';
 import { IConversationsService } from 'src/conversations/conversations';
-import { IGroupsService } from 'src/groups/groups';
+import { IGroupsService } from 'src/groups/interfaces/groups';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import { Conversation, Group, GroupMessage, Message } from 'src/utils/typeorm';
