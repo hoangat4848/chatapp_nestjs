@@ -15,6 +15,6 @@ export interface IGroupRecipientsService {
   removeGroupRecipient(
     params: RemoveGroupRecipientParams,
   ): Promise<RemoveGroupUserReponse>;
-  leaveGroup(params: LeaveGroupParams);
+  leaveGroup(params: LeaveGroupParams): Promise<Group>;
   isUserInGroup(params: CheckUserInGroupParams): Promise<Group>;
 }

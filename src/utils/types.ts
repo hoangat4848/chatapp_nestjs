@@ -144,3 +144,8 @@ export type CheckUserInGroupParams = {
   userId: number;
   groupId: number;
 };
+
+export type GroupUserLeaveEventPayload = {
+  group: Group;
+  userId: number;
+};

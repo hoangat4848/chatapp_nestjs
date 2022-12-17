@@ -55,7 +55,13 @@ export class GroupRecipientsController {
       userId: user.id,
       groupId,
     };
-    return this.groupRecipientsService.leaveGroup(params);
+    const updatedGroup = await this.groupRecipientsService.leaveGroup(params);
+    this.eventEmitter.emit('group.user.leave', {
+      group: updatedGroup,
+      userId: user.id,
+    });
+
+    return updatedGroup;
   }
 
   @Delete(':userId')
