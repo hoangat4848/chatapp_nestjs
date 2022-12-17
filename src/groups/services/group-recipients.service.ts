@@ -7,10 +7,13 @@ import { Services } from 'src/utils/constants';
 import { Group } from 'src/utils/typeorm';
 import {
   AddGroupRecipientParams,
+  CheckUserInGroupParams,
+  LeaveGroupParams,
   RemoveGroupRecipientParams,
   RemoveGroupUserReponse,
 } from 'src/utils/types';
 import { GroupNotFoundException } from '../exceptions/GroupNotFound';
+import { GroupParticipantNotFound } from '../exceptions/GroupParticipantNotFound';
 import { NotGroupOwnerException } from '../exceptions/NotGroupOwner';
 import { IGroupRecipientsService } from '../interfaces/group-recipients';
 import { IGroupsService } from '../interfaces/groups';
@@ -71,5 +74,26 @@ export class GroupRecipientsService implements IGroupRecipientsService {
 
     const savedGroup = await this.groupsService.saveGroup(group);
     return { group: savedGroup, user: userToBeRemoved };
+  }
+
+  async isUserInGroup(params: CheckUserInGroupParams): Promise<Group> {
+    const { groupId, userId } = params;
+    const group = await this.groupsService.findGroupById(groupId);
+    if (!group) throw new GroupNotFoundException();
+    const userInGroup = group.users.find((user) => user.id === userId);
+    if (!userInGroup) throw new GroupParticipantNotFound();
+    return group;
+  }
+
+  async leaveGroup(params: LeaveGroupParams) {
+    const { groupId, userId } = params;
+    const group = await this.isUserInGroup({ groupId, userId });
+    if (group.owner.id === userId)
+      throw new HttpException(
+        'Cannot leave group as owner',
+        HttpStatus.BAD_REQUEST,
+      );
+    group.users = group.users.filter((user) => user.id !== userId);
+    return this.groupsService.saveGroup(group);
   }
 }

@@ -134,3 +134,13 @@ export type TransferGroupOwnerParams = {
   groupId: number;
   newOwnerId: number;
 };
+
+export type LeaveGroupParams = {
+  userId: number;
+  groupId: number;
+};
+
+export type CheckUserInGroupParams = {
+  userId: number;
+  groupId: number;
+};

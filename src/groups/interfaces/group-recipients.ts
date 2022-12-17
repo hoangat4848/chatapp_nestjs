@@ -2,6 +2,8 @@ import { Group } from 'src/utils/typeorm';
 import {
   AddGroupRecipientParams,
   AddGroupUserReponse,
+  CheckUserInGroupParams,
+  LeaveGroupParams,
   RemoveGroupRecipientParams,
   RemoveGroupUserReponse,
 } from 'src/utils/types';
@@ -13,4 +15,6 @@ export interface IGroupRecipientsService {
   removeGroupRecipient(
     params: RemoveGroupRecipientParams,
   ): Promise<RemoveGroupUserReponse>;
+  leaveGroup(params: LeaveGroupParams);
+  isUserInGroup(params: CheckUserInGroupParams): Promise<Group>;
 }

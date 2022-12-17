@@ -11,6 +11,7 @@ import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import {
   AddGroupRecipientParams,
+  LeaveGroupParams,
   RemoveGroupRecipientParams,
 } from 'src/utils/types';
 import { AddGroupRecipientDto } from '../dtos/AddGroupRecipient.dto';
@@ -37,6 +38,24 @@ export class GroupRecipientsController {
     );
     this.eventEmitter.emit('group.user.added', response);
     return response;
+  }
+
+  /**
+   * Leaves a Group
+   * @param user the authenticated User
+   * @param groupId the id of the group
+   * @returns the updated Group that the user had left
+   */
+  @Delete('/leave')
+  async leaveGroup(
+    @AuthUser() user: User,
+    @Param('id', ParseIntPipe) groupId: number,
+  ) {
+    const params: LeaveGroupParams = {
+      userId: user.id,
+      groupId,
+    };
+    return this.groupRecipientsService.leaveGroup(params);
   }
 
   @Delete(':userId')
