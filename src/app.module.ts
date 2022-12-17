@@ -29,10 +29,10 @@ import { APP_GUARD } from '@nestjs/core';
       entities,
       synchronize: true,
     }),
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
-    }),
+    // ThrottlerModule.forRoot({
+    //   ttl: 60,
+    //   limit: 10,
+    // }),
     AuthModule,
     UsersModule,
     ConversationsModule,
@@ -42,10 +42,10 @@ import { APP_GUARD } from '@nestjs/core';
   ],
   controllers: [],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ],
 })
 export class AppModule {
