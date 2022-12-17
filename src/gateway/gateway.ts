@@ -15,7 +15,13 @@ import { IConversationsService } from 'src/conversations/conversations';
 import { IGroupsService } from 'src/groups/interfaces/groups';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Conversation, Group, GroupMessage, Message } from 'src/utils/typeorm';
+import {
+  Conversation,
+  Group,
+  GroupMessage,
+  Message,
+  User,
+} from 'src/utils/typeorm';
 import {
   AddGroupUserReponse,
   CreateGroupMessageResponse,
@@ -63,8 +69,6 @@ export class MessagingGateway
     @MessageBody() data: { groupId: number },
     @ConnectedSocket() socket: AuthenticatedSocket,
   ) {
-    console.log('handle...');
-    console.log(data);
     const clientsInRoom = this.server.sockets.adapter.rooms.get(
       `group-${data.groupId}`,
     );
@@ -77,9 +81,10 @@ export class MessagingGateway
       socket ? onlineUsers.push(user) : offlineUsers.push(user);
     });
 
-    console.log(onlineUsers);
-    console.log(offlineUsers);
-    socket.emit('onlineGroupUsersReceived', { onlineUsers, offlineUsers });
+    socket.emit('onlineGroupUsersReceived', {
+      onlineUsers: plainToInstance(User, onlineUsers),
+      offlineUsers: plainToInstance(User, offlineUsers),
+    });
   }
 
   @SubscribeMessage('createMessage')
@@ -209,18 +214,6 @@ export class MessagingGateway
     if (recipientSocket) recipientSocket.emit('onMessageUpdate', payload);
   }
 
-  @OnEvent('group.message.created')
-  async handleGroupMessageCreated(payload: CreateGroupMessageResponse) {
-    const { group } = payload;
-    const userIds = group.users.map((user) => user.id);
-    const sockets = userIds.map((userId) =>
-      this.sessionsService.getUserSocket(userId),
-    );
-    sockets.forEach(
-      (socket) => socket && socket.emit('onGroupMessage', payload),
-    );
-  }
-
   @OnEvent('group.created')
   async handleGroupCreated(payload: Group) {
     const sockets: AuthenticatedSocket[] = [];
@@ -228,6 +221,22 @@ export class MessagingGateway
       const socket = this.sessionsService.getUserSocket(user.id);
       socket && socket.emit('onGroupCreate', payload);
     });
+  }
+
+  @OnEvent('group.message.created')
+  async handleGroupMessageCreated(payload: CreateGroupMessageResponse) {
+    const { group } = payload;
+    const userIds = group.users.map((user) => user.id);
+    console.log('ok');
+
+    const sockets = userIds.map((userId) =>
+      this.sessionsService.getUserSocket(userId),
+    );
+    console.log(sockets);
+
+    sockets.forEach(
+      (socket) => socket && socket.emit('onGroupMessage', payload),
+    );
   }
 
   @OnEvent('group.message.deleted')
@@ -264,6 +273,20 @@ export class MessagingGateway
   async handleGroupUserRemoved(payload: RemoveGroupUserReponse) {
     const { group, user } = payload;
 
-    this.server.to(`group-${group.id}`).emit('onGroupUserRemove', payload);
+    const ROOM_NAME = `group-${group.id}`;
+    const removedUserSocket = this.sessionsService.getUserSocket(user.id);
+
+    if (removedUserSocket) {
+      removedUserSocket.emit('onGroupRemoved', group);
+      removedUserSocket.leave(ROOM_NAME);
+    }
+
+    const transformedPayload = {
+      group: plainToInstance(Group, group),
+      user: plainToInstance(User, user),
+    };
+    this.server
+      .to(ROOM_NAME)
+      .emit('onGroupRecipientRemoved', transformedPayload);
   }
 }
