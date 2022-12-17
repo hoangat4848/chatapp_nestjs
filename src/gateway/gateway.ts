@@ -289,4 +289,13 @@ export class MessagingGateway
       .to(ROOM_NAME)
       .emit('onGroupRecipientRemoved', transformedPayload);
   }
+
+  @OnEvent('group.owner.updated')
+  async handleGroupOwnerUpdated(payload: Group) {
+    const ROOM_NAME = `group-${payload.id}`;
+    console.log('inside group.owner.updated');
+    this.server
+      .to(ROOM_NAME)
+      .emit('onGroupOwnerUpdate', plainToInstance(Group, payload));
+  }
 }

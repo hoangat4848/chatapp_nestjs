@@ -58,7 +58,7 @@ export class GroupsController {
   }
 
   @Patch(':id/owner')
-  updateGroupOwner(
+  async updateGroupOwner(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) groupId: number,
     @Body() { newOwnerId }: TransferOwnerDto,
@@ -68,6 +68,9 @@ export class GroupsController {
       groupId,
       newOwnerId,
     };
-    return this.groupsService.transferGroupOwner(params);
+    const updatedGroup = await this.groupsService.transferGroupOwner(params);
+
+    this.eventEmitter.emit('group.owner.updated', updatedGroup);
+    return updatedGroup;
   }
 }
