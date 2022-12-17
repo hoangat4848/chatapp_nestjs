@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IMessagesService } from 'src/messages/messages';
+import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
 import { IUsersService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
 import { Conversation, User } from 'src/utils/typeorm';
@@ -64,11 +65,10 @@ export class ConversationsService implements IConversationsService {
   }
 
   async createConversation(user: User, params: CreateConversationParams) {
-    const { email } = params;
+    const { email, message: content } = params;
 
     const recipient = await this.usersService.findUser({ email });
-    if (!recipient)
-      throw new HttpException('Recipient not found', HttpStatus.BAD_REQUEST);
+    if (!recipient) throw new UserNotFoundException();
 
     if (user.id === recipient.id)
       throw new HttpException(
@@ -76,19 +76,7 @@ export class ConversationsService implements IConversationsService {
         HttpStatus.BAD_REQUEST,
       );
 
-    const existingConversation = await this.conversationRepository.findOne({
-      where: [
-        {
-          creator: { id: user.id },
-          recipient: { id: recipient.id },
-        },
-        {
-          creator: { id: recipient.id },
-          recipient: { id: user.id },
-        },
-      ],
-    });
-
+    const existingConversation = await this.isCreated(user.id, recipient.id);
     if (existingConversation)
       throw new HttpException('Conversation exists', HttpStatus.CONFLICT);
 
@@ -101,10 +89,10 @@ export class ConversationsService implements IConversationsService {
       conversation,
     );
 
-    if (params.message) {
-      const { message } = await this.messagesService.createMessage({
+    if (content) {
+      const { message: newMessage } = await this.messagesService.createMessage({
         user,
-        content: params.message,
+        content,
         conversationId: newConversation.id,
       });
     }
@@ -120,5 +108,20 @@ export class ConversationsService implements IConversationsService {
     return (
       conversation.creator.id === userId || conversation.recipient.id === userId
     );
+  }
+
+  async isCreated(userId: number, recipientId: number) {
+    return this.conversationRepository.findOne({
+      where: [
+        {
+          creator: { id: userId },
+          recipient: { id: recipientId },
+        },
+        {
+          creator: { id: recipientId },
+          recipient: { id: userId },
+        },
+      ],
+    });
   }
 }
