@@ -50,6 +50,12 @@ export class GroupRecipientsController {
       groupId,
       removeUserId,
     };
-    return this.groupRecipientsService.removeGroupRecipient(params);
+
+    const response = await this.groupRecipientsService.removeGroupRecipient(
+      params,
+    );
+    this.eventEmitter.emit('group.user.removed', response);
+
+    return response.group;
   }
 }

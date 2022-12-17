@@ -10,9 +10,13 @@ import { IMessagesService } from 'src/messages/messages';
 import { IUsersService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
 import { Conversation, User } from 'src/utils/typeorm';
-import { CreateConversationParams } from 'src/utils/types';
+import {
+  ConversationAccessParams,
+  CreateConversationParams,
+} from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IConversationsService } from './conversations';
+import { ConversationNotFoundException } from './exceptions/ConversationNotFound';
 
 @Injectable()
 export class ConversationsService implements IConversationsService {
@@ -49,7 +53,7 @@ export class ConversationsService implements IConversationsService {
       .getMany();
   }
 
-  async findConversationById(id: number): Promise<Conversation> {
+  async findConversationById(id: number): Promise<Conversation | undefined> {
     const conversation = await this.conversationRepository.findOne({
       where: { id },
       relations: {
@@ -109,5 +113,15 @@ export class ConversationsService implements IConversationsService {
     }
 
     return newConversation;
+  }
+
+  async hasAccess(params: ConversationAccessParams): Promise<boolean> {
+    const { conversationId, userId } = params;
+
+    const conversation = await this.findConversationById(conversationId);
+    if (!conversation) throw new ConversationNotFoundException();
+    return (
+      conversation.creator.id === userId || conversation.recipient.id === userId
+    );
   }
 }

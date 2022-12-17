@@ -3,11 +3,14 @@ import {
   AddGroupRecipientParams,
   AddGroupUserReponse,
   RemoveGroupRecipientParams,
+  RemoveGroupUserReponse,
 } from 'src/utils/types';
 
 export interface IGroupRecipientsService {
   addGroupRecipient(
     params: AddGroupRecipientParams,
   ): Promise<AddGroupUserReponse>;
-  removeGroupRecipient(params: RemoveGroupRecipientParams): Promise<Group>;
+  removeGroupRecipient(
+    params: RemoveGroupRecipientParams,
+  ): Promise<RemoveGroupUserReponse>;
 }

@@ -7,6 +7,7 @@ import { Group } from 'src/utils/typeorm';
 import {
   AddGroupRecipientParams,
   RemoveGroupRecipientParams,
+  RemoveGroupUserReponse,
 } from 'src/utils/types';
 import { NotFoundGroupException } from '../exceptions/NotFoundGroup';
 import { NotGroupOwnerException } from '../exceptions/NotGroupOwner';
@@ -46,14 +47,24 @@ export class GroupRecipientsService implements IGroupRecipientsService {
 
   async removeGroupRecipient(
     params: RemoveGroupRecipientParams,
-  ): Promise<Group> {
+  ): Promise<RemoveGroupUserReponse> {
     const { issuerId, groupId, removeUserId } = params;
+
+    const userToBeRemoved = await this.usersService.findUser({
+      id: removeUserId,
+    });
+    if (!userToBeRemoved)
+      throw new HttpException('User cannot be removed', HttpStatus.BAD_REQUEST);
+
     const group = await this.groupsService.findGroupById(groupId);
     if (!group) throw new NotFoundGroupException();
 
+    console.log('OI!!!!!');
+    console.log(`issuerId: ${issuerId}, creator: ${group.creator.id}`);
+
     // Not group owner
     if (issuerId !== group.creator.id) throw new NotGroupOwnerException();
-
+    // Not removing self
     if (group.creator.id === removeUserId)
       throw new HttpException(
         'Cannot remove yourself as owner',
@@ -62,6 +73,7 @@ export class GroupRecipientsService implements IGroupRecipientsService {
 
     group.users = group.users.filter((user) => user.id !== removeUserId);
 
-    return this.groupsService.saveGroup(group);
+    const savedGroup = await this.groupsService.saveGroup(group);
+    return { group: savedGroup, user: userToBeRemoved };
   }
 }

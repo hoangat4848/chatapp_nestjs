@@ -22,6 +22,7 @@ import {
   CreateMessageResponse,
   DeleteGroupMessageResponse,
   DeleteMessageReponse,
+  RemoveGroupUserReponse,
 } from 'src/utils/types';
 import { IGatewaySession } from './gateway.session';
 
@@ -248,7 +249,21 @@ export class MessagingGateway
   async handleGroupUserAdded(payload: AddGroupUserReponse) {
     const { group, user } = payload;
     const recipientSocket = this.sessionsService.getUserSocket(user.id);
+
+    // Send event & group to the new user
     if (recipientSocket)
       recipientSocket.emit('onGroupUserAdd', plainToInstance(Group, group));
+
+    // Send event to all pariticpants in room
+    this.server
+      .to(`group-${payload.group.id}`)
+      .emit('onGroupReceivedNewUser', payload);
+  }
+
+  @OnEvent('group.user.removed')
+  async handleGroupUserRemoved(payload: RemoveGroupUserReponse) {
+    const { group, user } = payload;
+
+    this.server.to(`group-${group.id}`).emit('onGroupUserRemove', payload);
   }
 }

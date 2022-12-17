@@ -1,4 +1,9 @@
+import { Request } from 'express';
 import { Conversation, Group, GroupMessage, Message, User } from './typeorm';
+
+export interface AuthenticatedRequest extends Request {
+  user: User;
+}
 
 export type CreateUserDetails = {
   email: string;
@@ -21,9 +26,11 @@ export type CreateConversationParams = {
   email: string;
   message?: string;
 };
-export interface AuthenticatedRequest extends Request {
-  user: User;
-}
+
+export type ConversationAccessParams = {
+  conversationId: number;
+  userId: number;
+};
 
 export type CreateMessageParams = {
   user: User;
@@ -115,4 +122,9 @@ export type RemoveGroupRecipientParams = {
   issuerId: number;
   groupId: number;
   removeUserId: number;
+};
+
+export type RemoveGroupUserReponse = {
+  group: Group;
+  user: User;
 };
