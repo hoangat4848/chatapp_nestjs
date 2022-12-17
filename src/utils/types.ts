@@ -27,11 +27,6 @@ export type CreateConversationParams = {
   message?: string;
 };
 
-export type ConversationAccessParams = {
-  conversationId: number;
-  userId: number;
-};
-
 export type CreateMessageParams = {
   user: User;
   content: string;
@@ -127,4 +122,9 @@ export type RemoveGroupRecipientParams = {
 export type RemoveGroupUserReponse = {
   group: Group;
   user: User;
+};
+
+export type AccessParams = {
+  id: number;
+  userId: number;
 };

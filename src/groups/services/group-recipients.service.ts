@@ -9,7 +9,7 @@ import {
   RemoveGroupRecipientParams,
   RemoveGroupUserReponse,
 } from 'src/utils/types';
-import { NotFoundGroupException } from '../exceptions/NotFoundGroup';
+import { GroupNotFoundException } from '../exceptions/GroupNotFound';
 import { NotGroupOwnerException } from '../exceptions/NotGroupOwner';
 import { IGroupRecipientsService } from '../interfaces/group-recipients';
 import { IGroupsService } from '../interfaces/groups';
@@ -57,7 +57,7 @@ export class GroupRecipientsService implements IGroupRecipientsService {
       throw new HttpException('User cannot be removed', HttpStatus.BAD_REQUEST);
 
     const group = await this.groupsService.findGroupById(groupId);
-    if (!group) throw new NotFoundGroupException();
+    if (!group) throw new GroupNotFoundException();
 
     console.log('OI!!!!!');
     console.log(`issuerId: ${issuerId}, creator: ${group.creator.id}`);

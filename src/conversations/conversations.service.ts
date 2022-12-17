@@ -10,10 +10,7 @@ import { IMessagesService } from 'src/messages/messages';
 import { IUsersService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
 import { Conversation, User } from 'src/utils/typeorm';
-import {
-  ConversationAccessParams,
-  CreateConversationParams,
-} from 'src/utils/types';
+import { AccessParams, CreateConversationParams } from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IConversationsService } from './conversations';
 import { ConversationNotFoundException } from './exceptions/ConversationNotFound';
@@ -115,8 +112,8 @@ export class ConversationsService implements IConversationsService {
     return newConversation;
   }
 
-  async hasAccess(params: ConversationAccessParams): Promise<boolean> {
-    const { conversationId, userId } = params;
+  async hasAccess(params: AccessParams): Promise<boolean> {
+    const { id: conversationId, userId } = params;
 
     const conversation = await this.findConversationById(conversationId);
     if (!conversation) throw new ConversationNotFoundException();
