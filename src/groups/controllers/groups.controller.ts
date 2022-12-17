@@ -5,6 +5,7 @@ import {
   Inject,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -13,8 +14,13 @@ import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
-import { CreateGroupParams, FetchGroupParams } from 'src/utils/types';
+import {
+  CreateGroupParams,
+  FetchGroupParams,
+  TransferGroupOwnerParams,
+} from 'src/utils/types';
 import { CreateGroupDto } from '../dtos/CreateGroup.dto';
+import { TransferOwnerDto } from '../dtos/TransferGroupOwner.dto';
 import { IGroupsService } from '../interfaces/groups';
 
 @UseGuards(AuthenticatedGuard)
@@ -49,5 +55,19 @@ export class GroupsController {
   @Get(':id')
   getGroup(@AuthUser() user: User, @Param('id', ParseIntPipe) id: number) {
     return this.groupsService.findGroupById(id);
+  }
+
+  @Patch(':id/owner')
+  updateGroupOwner(
+    @AuthUser() user: User,
+    @Param('id', ParseIntPipe) groupId: number,
+    @Body() { newOwnerId }: TransferOwnerDto,
+  ) {
+    const params: TransferGroupOwnerParams = {
+      userId: user.id,
+      groupId,
+      newOwnerId,
+    };
+    return this.groupsService.transferGroupOwner(params);
   }
 }

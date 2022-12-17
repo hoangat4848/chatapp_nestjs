@@ -3,6 +3,7 @@ import {
   AccessParams,
   CreateGroupParams,
   FetchGroupParams,
+  TransferGroupOwnerParams,
 } from 'src/utils/types';
 
 export interface IGroupsService {
@@ -11,4 +12,5 @@ export interface IGroupsService {
   findGroupById(id: number): Promise<Group>;
   saveGroup(group: Group): Promise<Group>;
   hasAccess(params: AccessParams): Promise<boolean>;
+  transferGroupOwner(params: TransferGroupOwnerParams): Promise<Group>;
 }

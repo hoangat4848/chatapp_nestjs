@@ -1,6 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Inject } from '@nestjs/common/decorators/core/inject.decorator';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
 import { IUsersService } from 'src/users/user';
 import { Services } from 'src/utils/constants';
 import { Group } from 'src/utils/typeorm';
@@ -27,12 +28,10 @@ export class GroupRecipientsService implements IGroupRecipientsService {
     if (!group)
       throw new HttpException('Group Not Found', HttpStatus.BAD_REQUEST);
 
-    if (issuerId !== group.creator.id)
-      throw new HttpException('Insufficient Permissions', HttpStatus.FORBIDDEN);
+    if (group.owner.id !== issuerId) throw new NotGroupOwnerException();
 
     const recipient = await this.usersService.findUser({ email });
-    if (!recipient)
-      throw new HttpException('Recipient Not Found', HttpStatus.BAD_REQUEST);
+    if (!recipient) throw new UserNotFoundException();
 
     const recipientInGroup = group.users.find(
       (user) => user.id === recipient.id,
@@ -59,13 +58,10 @@ export class GroupRecipientsService implements IGroupRecipientsService {
     const group = await this.groupsService.findGroupById(groupId);
     if (!group) throw new GroupNotFoundException();
 
-    console.log('OI!!!!!');
-    console.log(`issuerId: ${issuerId}, creator: ${group.creator.id}`);
-
     // Not group owner
-    if (issuerId !== group.creator.id) throw new NotGroupOwnerException();
+    if (issuerId !== group.owner.id) throw new NotGroupOwnerException();
     // Not removing self
-    if (group.creator.id === removeUserId)
+    if (group.owner.id === removeUserId)
       throw new HttpException(
         'Cannot remove yourself as owner',
         HttpStatus.BAD_REQUEST,

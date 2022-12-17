@@ -26,6 +26,10 @@ export class Group {
   @JoinColumn()
   creator: User;
 
+  @ManyToOne(() => User)
+  @JoinColumn()
+  owner: User;
+
   @ManyToMany(() => User, (user) => user.groups)
   @JoinTable()
   users: User[];
