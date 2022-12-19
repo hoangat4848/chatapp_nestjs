@@ -41,6 +41,7 @@ import { FriendRequestsModule } from './friend-requests/friend-requests.module';
     MessagesModule,
     GatewayModule,
     GroupsModule,
+    FriendsModule,
     FriendRequestsModule,
   ],
   controllers: [],

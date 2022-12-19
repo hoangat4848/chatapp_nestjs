@@ -7,7 +7,7 @@ import { FriendsController } from './friends.controller';
 import { FriendsService } from './friends.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Friend]), UsersModule],
+  imports: [TypeOrmModule.forFeature([Friend])],
   controllers: [FriendsController],
   providers: [{ provide: Services.FRIENDS, useClass: FriendsService }],
 })
