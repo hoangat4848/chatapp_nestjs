@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class CreateFriendDto {
+export class CreateFriendRequestDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
