@@ -149,3 +149,10 @@ export type GroupUserLeaveEventPayload = {
   group: Group;
   userId: number;
 };
+
+export type CreateFriendParams = {
+  user: User;
+  email: string;
+};
+
+export type FriendStatus = 'accepted' | 'pending' | 'blocked';

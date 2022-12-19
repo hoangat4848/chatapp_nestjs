@@ -13,6 +13,7 @@ import { DataSource } from 'typeorm';
 import { GroupsModule } from './groups/groups.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { APP_GUARD } from '@nestjs/core';
     MessagesModule,
     GatewayModule,
     GroupsModule,
+    FriendsModule,
   ],
   controllers: [],
   providers: [
