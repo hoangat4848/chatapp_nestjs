@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   Param,
   ParseIntPipe,
@@ -49,5 +50,10 @@ export class FriendRequestsController {
       userId: user.id,
     };
     return this.friendRequestsService.accept(params);
+  }
+
+  @Get()
+  getFriendRequest(@AuthUser() user: User) {
+    return this.friendRequestsService.getFriendRequests(user.id);
   }
 }

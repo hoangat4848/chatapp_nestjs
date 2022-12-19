@@ -49,6 +49,26 @@ export class FriendRequestsService implements IFriendRequestsService {
     return this.friendRequestsRepository.save(friend);
   }
 
+  async getFriendRequests(userId: number): Promise<FriendRequest[]> {
+    const status = 'pending';
+    return this.friendRequestsRepository.find({
+      where: [
+        {
+          sender: { id: userId },
+          status,
+        },
+        {
+          receiver: { id: userId },
+          status,
+        },
+      ],
+      relations: {
+        sender: true,
+        receiver: true,
+      },
+    });
+  }
+
   async accept(params: AcceptFriendRequestParams): Promise<Friend> {
     const { id, userId } = params;
 

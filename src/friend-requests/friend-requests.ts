@@ -6,8 +6,9 @@ import {
 
 export interface IFriendRequestsService {
   create(params: CreateFriendRequestParams): Promise<FriendRequest>;
-  isPending(userOneId: number, userTwoId: number);
-  isFriends(userOneId: number, userTwoId: number);
+  getFriendRequests(userId: number): Promise<FriendRequest[]>;
+  isPending(userOneId: number, userTwoId: number): Promise<FriendRequest>;
+  isFriends(userOneId: number, userTwoId: number): Promise<FriendRequest>;
   accept(params: AcceptFriendRequestParams): Promise<Friend>;
   findById(id: number): Promise<FriendRequest>;
 }
