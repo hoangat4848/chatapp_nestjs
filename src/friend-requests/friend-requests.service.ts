@@ -6,6 +6,7 @@ import { Services } from 'src/utils/constants';
 import { Friend, FriendRequest } from 'src/utils/typeorm';
 import {
   AcceptFriendRequestParams,
+  AcceptFriendRequestResponse,
   CancelFriendRequestParams,
   CreateFriendRequestParams,
 } from 'src/utils/types';
@@ -73,7 +74,9 @@ export class FriendRequestsService implements IFriendRequestsService {
     });
   }
 
-  async accept(params: AcceptFriendRequestParams): Promise<Friend> {
+  async accept(
+    params: AcceptFriendRequestParams,
+  ): Promise<AcceptFriendRequestResponse> {
     const { id, userId } = params;
 
     const friendRequest = await this.findById(id);
@@ -83,15 +86,18 @@ export class FriendRequestsService implements IFriendRequestsService {
     if (friendRequest.receiver.id !== userId)
       throw new FriendRequestException();
     friendRequest.status = 'accepted';
-    await this.friendRequestsRepository.save(friendRequest);
+    const updatedFriendRequest = await this.friendRequestsRepository.save(
+      friendRequest,
+    );
     const newFriend = this.friendsRepository.create({
       sender: friendRequest.sender,
       receiver: friendRequest.receiver,
     });
-    return this.friendsRepository.save(newFriend);
+    const friend = await this.friendsRepository.save(newFriend);
+    return { friend, friendRequest: updatedFriendRequest };
   }
 
-  async cancel(params: CancelFriendRequestParams) {
+  async cancel(params: CancelFriendRequestParams): Promise<FriendRequest> {
     const { id, userId } = params;
 
     const friendRequest = await this.findById(id);
@@ -101,9 +107,10 @@ export class FriendRequestsService implements IFriendRequestsService {
     if (friendRequest.sender.id !== userId)
       throw new NotFriendRequestSenderException();
 
-    return this.friendRequestsRepository.delete({
+    await this.friendRequestsRepository.delete({
       id,
     });
+    return friendRequest;
   }
 
   async reject(params: CancelFriendRequestParams) {

@@ -1,5 +1,13 @@
 import { Request } from 'express';
-import { Conversation, Group, GroupMessage, Message, User } from './typeorm';
+import {
+  Conversation,
+  Friend,
+  FriendRequest,
+  Group,
+  GroupMessage,
+  Message,
+  User,
+} from './typeorm';
 
 export interface AuthenticatedRequest extends Request {
   user: User;
@@ -175,4 +183,9 @@ export type RejectFriendRequestParams = {
 export type DeleteFriendParams = {
   id: number;
   userId: number;
+};
+
+export type AcceptFriendRequestResponse = {
+  friend: Friend;
+  friendRequest: FriendRequest;
 };

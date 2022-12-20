@@ -28,4 +28,17 @@ export class FriendRequestsEvents {
         plainToInstance(FriendRequest, payload),
       );
   }
+
+  @OnEvent('friend.request.canceled')
+  handleFriendRequestCanceledEvent(payload: FriendRequest) {
+    const receiverSocket = this.gatewaySessionsService.getUserSocket(
+      payload.receiver.id,
+    );
+
+    if (receiverSocket)
+      receiverSocket.emit(
+        'onFriendRequestCanceled',
+        plainToInstance(FriendRequest, plainToInstance(FriendRequest, payload)),
+      );
+  }
 }

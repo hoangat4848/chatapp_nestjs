@@ -3,6 +3,7 @@ import {
   CreateFriendRequestParams,
   AcceptFriendRequestParams,
   CancelFriendRequestParams,
+  AcceptFriendRequestResponse,
 } from 'src/utils/types';
 
 export interface IFriendRequestsService {
@@ -10,8 +11,10 @@ export interface IFriendRequestsService {
   getFriendRequests(userId: number): Promise<FriendRequest[]>;
   isPending(userOneId: number, userTwoId: number): Promise<FriendRequest>;
   isFriends(userOneId: number, userTwoId: number): Promise<FriendRequest>;
-  accept(params: AcceptFriendRequestParams): Promise<Friend>;
-  cancel(params: CancelFriendRequestParams);
+  accept(
+    params: AcceptFriendRequestParams,
+  ): Promise<AcceptFriendRequestResponse>;
+  cancel(params: CancelFriendRequestParams): Promise<FriendRequest>;
   reject(params: CancelFriendRequestParams);
   findById(id: number): Promise<FriendRequest>;
 }

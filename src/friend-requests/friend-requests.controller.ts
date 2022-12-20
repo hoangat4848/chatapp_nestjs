@@ -64,7 +64,7 @@ export class FriendRequestsController {
   }
 
   @Delete(':id/cancel')
-  cancelFriendRequest(
+  async cancelFriendRequest(
     @AuthUser() { id: userId }: User,
     @Param('id', ParseIntPipe) id: number,
   ) {
@@ -72,7 +72,9 @@ export class FriendRequestsController {
       id,
       userId,
     };
-    return this.friendRequestsService.cancel(params);
+    const response = await this.friendRequestsService.cancel(params);
+    this.eventEmitter.emit('friend.request.canceled', response);
+    return response;
   }
 
   @Patch(':id/reject')
