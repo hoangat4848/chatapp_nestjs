@@ -3,8 +3,9 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { plainToInstance } from 'class-transformer';
 import { MessagingGateway } from 'src/gateway/gateway';
 import { IGatewaySession } from 'src/gateway/gateway.session';
-import { Services } from 'src/utils/constants';
-import { FriendRequest } from 'src/utils/typeorm';
+import { ServerEvents, Services, WebsocketEvents } from 'src/utils/constants';
+import { Friend, FriendRequest } from 'src/utils/typeorm';
+import { AcceptFriendRequestResponse } from 'src/utils/types';
 
 @Injectable()
 export class FriendRequestsEvents {
@@ -29,7 +30,7 @@ export class FriendRequestsEvents {
       );
   }
 
-  @OnEvent('friend.request.canceled')
+  @OnEvent(ServerEvents.FRIEND_REQUEST_CANCELED)
   handleFriendRequestCanceledEvent(payload: FriendRequest) {
     const receiverSocket = this.gatewaySessionsService.getUserSocket(
       payload.receiver.id,
@@ -40,5 +41,19 @@ export class FriendRequestsEvents {
         'onFriendRequestCanceled',
         plainToInstance(FriendRequest, plainToInstance(FriendRequest, payload)),
       );
+  }
+
+  @OnEvent(ServerEvents.FRIEND_REQUEST_ACCEPTED)
+  handleFriendRequestAcceptedEvent(payload: AcceptFriendRequestResponse) {
+    console.log('inside' + ServerEvents.FRIEND_REQUEST_ACCEPTED);
+    const { friend, friendRequest } = payload;
+    const senderSocket = this.gatewaySessionsService.getUserSocket(
+      friendRequest.sender.id,
+    );
+    if (senderSocket)
+      senderSocket.emit(WebsocketEvents.FRIEND_REQUEST_ACCEPTED, {
+        friend: plainToInstance(Friend, friend),
+        friendRequest: plainToInstance(FriendRequest, friendRequest),
+      });
   }
 }
