@@ -155,7 +155,7 @@ export type CreateFriendRequestParams = {
   email: string;
 };
 
-export type FriendRequestStatus = 'accepted' | 'pending' | 'blocked';
+export type FriendRequestStatus = 'accepted' | 'pending' | 'rejected';
 
 export type AcceptFriendRequestParams = {
   id: number;

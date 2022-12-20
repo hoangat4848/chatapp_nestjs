@@ -70,4 +70,17 @@ export class FriendRequestsController {
     };
     return this.friendRequestsService.cancel(params);
   }
+
+  @Patch(':id/reject')
+  rejectFriendRequest(
+    @AuthUser() { id: userId }: User,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const params = {
+      id,
+      userId,
+    };
+
+    return this.friendRequestsService.reject(params);
+  }
 }

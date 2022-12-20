@@ -14,6 +14,9 @@ import { FriendRequestException } from './exceptions/FriendRequest';
 import { FriendRequestAcceptedException } from './exceptions/FriendRequestAccepted';
 import { FriendRequestNotFoundException } from './exceptions/FriendRequestNotFound';
 import { FriendRequestPendingException } from './exceptions/FriendRequestPending';
+import { FriendRequestRejectedException } from './exceptions/FriendRequestRejected';
+import { NotFriendRequestReceiverException } from './exceptions/NotFriendRequestReceiver';
+import { NotFriendRequestSenderException } from './exceptions/NotFriendRequestSender';
 import { IFriendRequestsService } from './friend-requests';
 
 @Injectable()
@@ -95,12 +98,27 @@ export class FriendRequestsService implements IFriendRequestsService {
     if (!friendRequest) throw new FriendRequestNotFoundException();
     if (friendRequest.status === 'accepted')
       throw new FriendRequestAcceptedException();
-    if (friendRequest.receiver.id !== userId)
-      throw new FriendRequestException();
+    if (friendRequest.sender.id !== userId)
+      throw new NotFriendRequestSenderException();
 
     return this.friendRequestsRepository.delete({
       id,
     });
+  }
+
+  async reject(params: CancelFriendRequestParams) {
+    const { id, userId } = params;
+
+    const friendRequest = await this.findById(id);
+    if (!friendRequest) throw new FriendRequestNotFoundException();
+    if (friendRequest.status === 'accepted')
+      throw new FriendRequestAcceptedException();
+    if (friendRequest.status === 'rejected')
+      throw new FriendRequestRejectedException();
+    if (friendRequest.receiver.id !== userId)
+      throw new NotFriendRequestReceiverException();
+    friendRequest.status = 'rejected';
+    return this.friendRequestsRepository.save(friendRequest);
   }
 
   isPending(userOneId: number, userTwoId: number) {
