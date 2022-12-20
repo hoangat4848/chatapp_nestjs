@@ -15,6 +15,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { FriendsModule } from './friends/friends.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { FriendRequestsModule } from './friend-requests/friend-requests.module';
     ConversationsModule,
     MessagesModule,
     GatewayModule,
+    EventsModule,
     GroupsModule,
     FriendsModule,
     FriendRequestsModule,

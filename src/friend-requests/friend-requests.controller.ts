@@ -10,6 +10,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -28,10 +29,11 @@ export class FriendRequestsController {
   constructor(
     @Inject(Services.FRIEND_REQUESTS)
     private readonly friendRequestsService: IFriendRequestsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
-  createFriendRequest(
+  async createFriendRequest(
     @AuthUser() user: User,
     @Body() { email }: CreateFriendRequestDto,
   ) {
@@ -39,7 +41,9 @@ export class FriendRequestsController {
       user,
       email,
     };
-    return this.friendRequestsService.create(params);
+    const newFriendRequest = await this.friendRequestsService.create(params);
+    this.eventEmitter.emit('friend.request.created', newFriendRequest);
+    return newFriendRequest;
   }
 
   @Patch(':id/accept')
