@@ -2,6 +2,7 @@ import { Friend, FriendRequest } from 'src/utils/typeorm';
 import {
   CreateFriendRequestParams,
   AcceptFriendRequestParams,
+  CancelFriendRequestParams,
 } from 'src/utils/types';
 
 export interface IFriendRequestsService {
@@ -10,5 +11,6 @@ export interface IFriendRequestsService {
   isPending(userOneId: number, userTwoId: number): Promise<FriendRequest>;
   isFriends(userOneId: number, userTwoId: number): Promise<FriendRequest>;
   accept(params: AcceptFriendRequestParams): Promise<Friend>;
+  cancel(params: CancelFriendRequestParams);
   findById(id: number): Promise<FriendRequest>;
 }

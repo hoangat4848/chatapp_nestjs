@@ -6,6 +6,7 @@ import { Services } from 'src/utils/constants';
 import { Friend, FriendRequest } from 'src/utils/typeorm';
 import {
   AcceptFriendRequestParams,
+  CancelFriendRequestParams,
   CreateFriendRequestParams,
 } from 'src/utils/types';
 import { Repository } from 'typeorm';
@@ -85,6 +86,21 @@ export class FriendRequestsService implements IFriendRequestsService {
       receiver: friendRequest.receiver,
     });
     return this.friendsRepository.save(newFriend);
+  }
+
+  async cancel(params: CancelFriendRequestParams) {
+    const { id, userId } = params;
+
+    const friendRequest = await this.findById(id);
+    if (!friendRequest) throw new FriendRequestNotFoundException();
+    if (friendRequest.status === 'accepted')
+      throw new FriendRequestAcceptedException();
+    if (friendRequest.receiver.id !== userId)
+      throw new FriendRequestException();
+
+    return this.friendRequestsRepository.delete({
+      id,
+    });
   }
 
   isPending(userOneId: number, userTwoId: number) {

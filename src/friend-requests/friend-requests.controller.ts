@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -15,6 +16,7 @@ import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import {
   AcceptFriendRequestParams,
+  CancelFriendRequestParams,
   CreateFriendRequestParams,
 } from 'src/utils/types';
 import { CreateFriendRequestDto } from './dtos/CreateFriendRequest.dto';
@@ -53,7 +55,19 @@ export class FriendRequestsController {
   }
 
   @Get()
-  getFriendRequest(@AuthUser() user: User) {
+  getFriendRequests(@AuthUser() user: User) {
     return this.friendRequestsService.getFriendRequests(user.id);
+  }
+
+  @Delete(':id/cancel')
+  cancelFriendRequest(
+    @AuthUser() { id: userId }: User,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const params: CancelFriendRequestParams = {
+      id,
+      userId,
+    };
+    return this.friendRequestsService.cancel(params);
   }
 }
