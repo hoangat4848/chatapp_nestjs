@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SkipThrottle } from '@nestjs/throttler';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, ServerEvents, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -24,7 +24,6 @@ import {
 import { CreateFriendRequestDto } from './dtos/CreateFriendRequest.dto';
 import { IFriendRequestsService } from './friend-requests';
 
-@SkipThrottle()
 @Controller(Routes.FRIEND_REQUESTS)
 @UseGuards(AuthenticatedGuard)
 export class FriendRequestsController {
@@ -34,6 +33,7 @@ export class FriendRequestsController {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  @Throttle(3, 10)
   @Post()
   async createFriendRequest(
     @AuthUser() user: User,
@@ -53,6 +53,7 @@ export class FriendRequestsController {
     return this.friendRequestsService.getFriendRequests(user.id);
   }
 
+  @Throttle(3, 10)
   @Patch(':id/accept')
   async acceptFriendRequest(
     @AuthUser() user: User,
@@ -67,6 +68,7 @@ export class FriendRequestsController {
     return response;
   }
 
+  @Throttle(3, 10)
   @Delete(':id/cancel')
   async cancelFriendRequest(
     @AuthUser() { id: userId }: User,
@@ -81,6 +83,7 @@ export class FriendRequestsController {
     return response;
   }
 
+  @Throttle(3, 10)
   @Patch(':id/reject')
   async rejectFriendRequest(
     @AuthUser() { id: userId }: User,

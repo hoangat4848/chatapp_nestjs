@@ -18,6 +18,7 @@ import { AuthenticatedGuard, LocalAuthGuard } from './utils/Guards';
 import { Response } from 'express';
 import { User } from 'src/utils/typeorm';
 import { AuthUser } from 'src/utils/decorators';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -26,6 +27,7 @@ export class AuthController {
     @Inject(Services.USERS) private userService: IUsersService,
   ) {}
 
+  @Throttle(1, 60)
   @Post('register')
   registerUser(@Body() createUserDto: CreateUserDto) {
     console.log(createUserDto.email);
