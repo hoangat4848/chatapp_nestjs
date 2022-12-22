@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common/decorators/http/route-params.decorator';
 import { ParseIntPipe } from '@nestjs/common/pipes/parse-int.pipe';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SkipThrottle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -17,6 +18,7 @@ import {
 import { AddGroupRecipientDto } from '../dtos/AddGroupRecipient.dto';
 import { IGroupRecipientsService } from '../interfaces/group-recipients';
 
+@SkipThrottle()
 @Controller(Routes.GROUP_RECIPIENTS)
 @UseGuards(AuthenticatedGuard)
 export class GroupRecipientsController {

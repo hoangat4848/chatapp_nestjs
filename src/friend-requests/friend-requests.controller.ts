@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SkipThrottle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, ServerEvents, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -23,6 +24,7 @@ import {
 import { CreateFriendRequestDto } from './dtos/CreateFriendRequest.dto';
 import { IFriendRequestsService } from './friend-requests';
 
+@SkipThrottle()
 @Controller(Routes.FRIEND_REQUESTS)
 @UseGuards(AuthenticatedGuard)
 export class FriendRequestsController {

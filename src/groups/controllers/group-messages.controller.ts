@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { Patch } from '@nestjs/common/decorators';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { CreateMessageDto } from 'src/messages/dtos/CreateMessage.dto';
 import { Routes, Services } from 'src/utils/constants';
@@ -33,6 +34,7 @@ export class GroupMessagesController {
   ) {}
 
   @Post()
+  @Throttle(5, 10)
   async createGroupMessage(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) groupId: number,
@@ -51,6 +53,7 @@ export class GroupMessagesController {
   }
 
   @Get()
+  @SkipThrottle()
   async getGroupMessages(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) groupId: number,
@@ -67,6 +70,7 @@ export class GroupMessagesController {
   }
 
   @Delete(':messageId')
+  @SkipThrottle()
   async deleteGroupMessage(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) groupId: number,
@@ -89,6 +93,7 @@ export class GroupMessagesController {
   }
 
   @Patch(':messageId')
+  @SkipThrottle()
   async updateGroupMessage(
     @AuthUser() { id: userId }: User,
     @Param('id', ParseIntPipe) groupId: number,

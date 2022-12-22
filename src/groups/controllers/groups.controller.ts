@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SkipThrottle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -24,6 +25,7 @@ import { CreateGroupDto } from '../dtos/CreateGroup.dto';
 import { TransferOwnerDto } from '../dtos/TransferGroupOwner.dto';
 import { IGroupsService } from '../interfaces/groups';
 
+@SkipThrottle()
 @UseGuards(AuthenticatedGuard)
 @Controller(Routes.GROUPS)
 export class GroupsController {

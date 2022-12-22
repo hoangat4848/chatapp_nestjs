@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -14,6 +15,7 @@ import { User } from 'src/utils/typeorm';
 import { DeleteFriendParams } from 'src/utils/types';
 import { IFriendsService } from './friends';
 
+@SkipThrottle()
 @Controller(Routes.FRIENDS)
 @UseGuards(AuthenticatedGuard)
 export class FriendsController {
