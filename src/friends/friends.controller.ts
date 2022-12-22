@@ -7,9 +7,10 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SkipThrottle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
-import { Routes, Services } from 'src/utils/constants';
+import { Routes, ServerEvents, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import { DeleteFriendParams } from 'src/utils/types';
@@ -21,6 +22,7 @@ import { IFriendsService } from './friends';
 export class FriendsController {
   constructor(
     @Inject(Services.FRIENDS) private readonly friendsService: IFriendsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Get()
@@ -29,7 +31,7 @@ export class FriendsController {
   }
 
   @Delete(':id')
-  deleteFriend(
+  async deleteFriend(
     @AuthUser() { id: userId }: User,
     @Param('id', ParseIntPipe) id: number,
   ) {
@@ -38,6 +40,11 @@ export class FriendsController {
       userId,
     };
 
-    return this.friendsService.deleteFriend(params);
+    const deletedFriend = await this.friendsService.deleteFriend(params);
+    this.eventEmitter.emit(ServerEvents.FRIEND_REMOVED, {
+      friend: deletedFriend,
+      userId,
+    });
+    return deletedFriend;
   }
 }
