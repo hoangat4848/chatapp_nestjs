@@ -12,5 +12,8 @@ import { FriendRequestsService } from './friend-requests.service';
   providers: [
     { provide: Services.FRIEND_REQUESTS, useClass: FriendRequestsService },
   ],
+  exports: [
+    { provide: Services.FRIEND_REQUESTS, useClass: FriendRequestsService },
+  ],
 })
 export class FriendRequestsModule {}

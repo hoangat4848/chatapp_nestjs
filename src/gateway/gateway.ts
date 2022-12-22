@@ -12,11 +12,13 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { Server } from 'socket.io';
 import { IConversationsService } from 'src/conversations/conversations';
+import { IFriendsService } from 'src/friends/friends';
 import { IGroupsService } from 'src/groups/interfaces/groups';
 import { Services } from 'src/utils/constants';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import {
   Conversation,
+  Friend,
   Group,
   GroupMessage,
   Message,
@@ -38,6 +40,8 @@ import { IGatewaySession } from './gateway.session';
     origin: ['http://localhost:3000'],
     credentials: true,
   },
+  pingInterval: 10000,
+  pingTimeout: 15000,
 })
 export class MessagingGateway
   implements OnGatewayConnection, OnGatewayDisconnect
@@ -52,6 +56,8 @@ export class MessagingGateway
     private readonly conversationsService: IConversationsService,
     @Inject(Services.GROUPS)
     private readonly groupsService: IGroupsService,
+    @Inject(Services.FRIENDS)
+    private readonly friendsService: IFriendsService,
   ) {}
 
   handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
@@ -162,6 +168,22 @@ export class MessagingGateway
     client.broadcast
       .to(`conversation-${data.conversationId}`)
       .emit('onUserStopTyping');
+  }
+
+  @SubscribeMessage('getOnlineFriends')
+  async handleFriendListRetrieve(
+    @MessageBody() data: any,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    const { user } = socket;
+    if (!user) return;
+    const friends = await this.friendsService.getFriends(user.id);
+    const onlineFriends = friends.filter((friend) =>
+      this.sessionsService.getUserSocket(
+        user.id === friend.receiver.id ? friend.sender.id : friend.receiver.id,
+      ),
+    );
+    socket.emit('getOnlineFriends', plainToInstance(Friend, onlineFriends));
   }
 
   @OnEvent('conversation.created')
