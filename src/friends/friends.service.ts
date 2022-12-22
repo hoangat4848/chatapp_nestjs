@@ -55,4 +55,19 @@ export class FriendsService implements IFriendsService {
       },
     });
   }
+
+  isFriends(userOneId: number, userTwoId: number): Promise<Friend> {
+    return this.friendsRepository.findOne({
+      where: [
+        {
+          sender: { id: userOneId },
+          receiver: { id: userTwoId },
+        },
+        {
+          sender: { id: userTwoId },
+          receiver: { id: userOneId },
+        },
+      ],
+    });
+  }
 }
