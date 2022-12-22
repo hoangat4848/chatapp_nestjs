@@ -36,9 +36,8 @@ export class FriendRequestsService implements IFriendRequestsService {
     const receiver = await this.usersService.findUser({ email });
     if (!receiver) throw new UserNotFoundException();
     if (sender.id === receiver.id)
-      throw new HttpException(
+      throw new FriendRequestException(
         'Cannot create friend request with yourself',
-        HttpStatus.BAD_REQUEST,
       );
 
     const exists = await this.isPending(sender.id, receiver.id);
