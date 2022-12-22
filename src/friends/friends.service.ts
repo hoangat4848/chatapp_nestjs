@@ -31,7 +31,7 @@ export class FriendsService implements IFriendsService {
     });
   }
 
-  async deleteFriend(params: DeleteFriendParams) {
+  async deleteFriend(params: DeleteFriendParams): Promise<Friend> {
     const { id, userId } = params;
 
     const friend = await this.findFriendById(id);
@@ -40,7 +40,8 @@ export class FriendsService implements IFriendsService {
     if (friend.receiver.id !== userId && friend.sender.id !== userId)
       throw new DeleteFriendException();
 
-    return this.friendsRepository.delete({ id });
+    await this.friendsRepository.delete({ id });
+    return friend;
   }
 
   findFriendById(id: number): Promise<Friend> {

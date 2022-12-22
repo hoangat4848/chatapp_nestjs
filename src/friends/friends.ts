@@ -4,5 +4,5 @@ import { DeleteFriendParams } from 'src/utils/types';
 export interface IFriendsService {
   getFriends(userId: number): Promise<Friend[]>;
   findFriendById(id: number): Promise<Friend>;
-  deleteFriend(params: DeleteFriendParams);
+  deleteFriend(params: DeleteFriendParams): Promise<Friend>;
 }
