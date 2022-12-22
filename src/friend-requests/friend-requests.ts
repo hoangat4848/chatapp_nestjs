@@ -15,6 +15,6 @@ export interface IFriendRequestsService {
     params: AcceptFriendRequestParams,
   ): Promise<AcceptFriendRequestResponse>;
   cancel(params: CancelFriendRequestParams): Promise<FriendRequest>;
-  reject(params: CancelFriendRequestParams);
+  reject(params: CancelFriendRequestParams): Promise<FriendRequest>;
   findById(id: number): Promise<FriendRequest>;
 }

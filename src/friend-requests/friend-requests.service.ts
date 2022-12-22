@@ -78,6 +78,7 @@ export class FriendRequestsService implements IFriendRequestsService {
     params: AcceptFriendRequestParams,
   ): Promise<AcceptFriendRequestResponse> {
     const { id, userId } = params;
+    console.log('ahoi');
 
     const friendRequest = await this.findById(id);
     if (!friendRequest) throw new FriendRequestNotFoundException();
@@ -113,7 +114,7 @@ export class FriendRequestsService implements IFriendRequestsService {
     return friendRequest;
   }
 
-  async reject(params: CancelFriendRequestParams) {
+  async reject(params: CancelFriendRequestParams): Promise<FriendRequest> {
     const { id, userId } = params;
 
     const friendRequest = await this.findById(id);

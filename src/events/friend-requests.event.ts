@@ -56,4 +56,16 @@ export class FriendRequestsEvents {
         friendRequest: plainToInstance(FriendRequest, friendRequest),
       });
   }
+
+  @OnEvent(ServerEvents.FRIEND_REQUEST_REJECTED)
+  handleFriendRequestRejectedEvent(payload: FriendRequest) {
+    const senderSocket = this.gatewaySessionsService.getUserSocket(
+      payload.sender.id,
+    );
+    if (senderSocket)
+      senderSocket.emit(
+        WebsocketEvents.FRIEND_REQUEST_REJECTED,
+        plainToInstance(FriendRequest, payload),
+      );
+  }
 }
