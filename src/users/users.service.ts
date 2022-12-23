@@ -2,7 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/utils/typeorm';
-import { CreateUserDetails, FindUserParams } from 'src/utils/types';
+import {
+  CreateUserDetails,
+  FindUserOptions,
+  FindUserParams,
+} from 'src/utils/types';
 import { IUsersService } from './user';
 import { hashPassword } from 'src/utils/helpers';
 
@@ -27,8 +31,20 @@ export class UsersService implements IUsersService {
     return this.userRepository.save(newUser);
   }
 
-  async findUser(findUserParams: FindUserParams) {
-    return this.userRepository.findOneBy(findUserParams);
+  async findUser(params: FindUserParams, options?: FindUserOptions) {
+    const selections: (keyof User)[] = [
+      'email',
+      'firstName',
+      'lastName',
+      'id',
+      'profile',
+    ];
+    const selectionsWithPassword: (keyof User)[] = [...selections, 'password'];
+
+    return this.userRepository.findOne({
+      where: params,
+      select: options?.selectAll ? selectionsWithPassword : selections,
+    });
   }
 
   async saveUser(user: User): Promise<User> {
@@ -41,7 +57,13 @@ export class UsersService implements IUsersService {
       .createQueryBuilder('user')
       .where(searchStatement, { query: `%${query}%` })
       .limit(10)
-      .select(['user.id', 'user.firstName', 'user.lastName', 'user.email'])
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.email',
+        'user.profile',
+      ])
       .getMany();
   }
 }

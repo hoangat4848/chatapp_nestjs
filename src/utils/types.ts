@@ -30,6 +30,10 @@ export type FindUserParams = Partial<{
   email: string;
 }>;
 
+export type FindUserOptions = Partial<{
+  selectAll: boolean;
+}>;
+
 export type CreateConversationParams = {
   email: string;
   message?: string;

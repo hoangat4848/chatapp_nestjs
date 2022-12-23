@@ -5,9 +5,12 @@ import {
   Column,
   OneToMany,
   ManyToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Group } from './Group';
 import { Message } from './Message';
+import { Profile } from './Profile';
 
 @Entity({ name: 'users' })
 export class User {
@@ -32,4 +35,8 @@ export class User {
 
   @ManyToMany(() => Group, (group) => group.users)
   groups: Group[];
+
+  @OneToOne(() => Profile)
+  @JoinColumn()
+  profile: Profile;
 }
