@@ -8,6 +8,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SkipThrottle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -15,13 +16,14 @@ import { User } from 'src/utils/typeorm';
 import { IConversationsService } from './conversations';
 import { CreateConversationDto } from './dtos/CreateConversation.dto';
 
+@SkipThrottle()
 @Controller(Routes.CONVERSATIONS)
 @UseGuards(AuthenticatedGuard)
 export class ConversationsController {
   constructor(
     @Inject(Services.CONVERSATIONS)
     private readonly conversationsService: IConversationsService,
-    private eventEmitter: EventEmitter2,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Post()

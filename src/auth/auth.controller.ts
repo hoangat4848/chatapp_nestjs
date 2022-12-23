@@ -15,9 +15,10 @@ import { Routes, Services } from 'src/utils/constants';
 import { IAuthService } from './auth';
 import { CreateUserDto } from './dtos/CreateUser.dto';
 import { AuthenticatedGuard, LocalAuthGuard } from './utils/Guards';
-import { Request, Response } from 'express';
-import { AuthUser } from 'src/utils/decorators';
+import { Response } from 'express';
 import { User } from 'src/utils/typeorm';
+import { AuthUser } from 'src/utils/decorators';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -26,9 +27,9 @@ export class AuthController {
     @Inject(Services.USERS) private userService: IUsersService,
   ) {}
 
+  @Throttle(3, 10)
   @Post('register')
   registerUser(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto.email);
     const user = this.userService.createUser(createUserDto);
 
     return instanceToPlain(user);
@@ -45,7 +46,7 @@ export class AuthController {
 
   @Get('status')
   @UseGuards(AuthenticatedGuard)
-  async status(@Req() req: Request, @Res() res: Response) {
-    res.send(req.user);
+  async status(@AuthUser() user: User) {
+    return user;
   }
 }

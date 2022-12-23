@@ -8,9 +8,10 @@ import { Session } from './utils/typeorm';
 import { TypeormStore } from 'connect-typeorm/out';
 import { DataSource } from 'typeorm';
 import { WebsocketAdapter } from './gateway/gateway.adapter';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const { PORT, COOKIE_SECRET } = process.env;
   const adapter = new WebsocketAdapter(app);
   app.useWebSocketAdapter(adapter);
@@ -23,6 +24,7 @@ async function bootstrap() {
   // console.log(AppDataSource.options);
   const sessionRepository = app.get(DataSource).getRepository(Session);
 
+  app.set('trust proxy', 'loopback');
   app.use(
     session({
       secret: COOKIE_SECRET,

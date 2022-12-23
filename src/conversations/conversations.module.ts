@@ -1,11 +1,13 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MessagesModule } from 'src/messages/messages.module';
 import { UsersModule } from 'src/users/users.module';
-import { Services } from 'src/utils/constants';
+import { Routes, Services } from 'src/utils/constants';
+import { isAuthorized } from 'src/utils/helpers';
 import { Conversation } from 'src/utils/typeorm';
 import { ConversationsController } from './conversations.controller';
 import { ConversationsService } from './conversations.service';
+import { ConversationMiddleware } from './middlewares/conversation.middleware';
 
 @Module({
   imports: [
@@ -27,4 +29,10 @@ import { ConversationsService } from './conversations.service';
     },
   ],
 })
-export class ConversationsModule {}
+export class ConversationsModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(isAuthorized, ConversationMiddleware)
+      .forRoutes(Routes.CONVERSATIONS + '/:id');
+  }
+}

@@ -3,11 +3,14 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  OneToMany,
+  ManyToMany,
   OneToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
+import { Group } from './Group';
 import { Message } from './Message';
+import { Profile } from './Profile';
 
 @Entity({ name: 'users' })
 export class User {
@@ -15,7 +18,7 @@ export class User {
   id: number;
 
   @Column({ unique: true })
-  email: string;
+  username: string;
 
   @Column()
   firstName: string;
@@ -29,4 +32,11 @@ export class User {
 
   @OneToMany(() => Message, (message) => message.author)
   messages: Message[];
+
+  @ManyToMany(() => Group, (group) => group.users)
+  groups: Group[];
+
+  @OneToOne(() => Profile)
+  @JoinColumn()
+  profile: Profile;
 }
