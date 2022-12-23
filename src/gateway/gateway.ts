@@ -67,7 +67,7 @@ export class MessagingGateway
 
   handleDisconnect(socket: AuthenticatedSocket) {
     console.log('handleDisconnect');
-    console.log(`${socket.user.email} disconnected.`);
+    console.log(`${socket.user.username} disconnected.`);
     this.sessionsService.removeUserSocket(socket.user.id);
   }
 

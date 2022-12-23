@@ -8,8 +8,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { SkipThrottle } from '@nestjs/throttler';
 import { Routes, Services } from 'src/utils/constants';
 import { UserProfileDto } from './dtos/UserProfile.dto';
+import { UserAlreadyExistsException } from './exceptions/UserAlreadyExists';
 import { IUsersService } from './user';
 
 @Controller(Routes.USERS)
@@ -34,5 +36,18 @@ export class UsersController {
   ) {
     console.log(file);
     console.log(userProfileDto.about, userProfileDto.username);
+  }
+
+  @SkipThrottle()
+  @Get('check')
+  async checkUsername(@Query('username') username: string) {
+    if (!username)
+      throw new HttpException('Invalid Query', HttpStatus.BAD_REQUEST);
+    const user = await this.usersService.findUser({ username });
+    if (user) throw new UserAlreadyExistsException();
+    return {
+      status: HttpStatus.OK,
+      message: "Username doesn't exist",
+    };
   }
 }

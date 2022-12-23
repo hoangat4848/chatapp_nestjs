@@ -27,8 +27,8 @@ export class GroupsService implements IGroupsService {
 
   async createGroup(params: CreateGroupParams): Promise<Group> {
     const { creator, users, title } = params;
-    const usersPromise = users.map((email) =>
-      this.usersService.findUser({ email }),
+    const usersPromise = users.map((username) =>
+      this.usersService.findUser({ username }),
     );
     const usersDB = (await Promise.all(usersPromise)).filter(
       (user) => user && user.id !== creator.id,

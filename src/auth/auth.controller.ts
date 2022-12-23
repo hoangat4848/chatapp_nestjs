@@ -27,10 +27,9 @@ export class AuthController {
     @Inject(Services.USERS) private userService: IUsersService,
   ) {}
 
-  @Throttle(1, 60)
+  @Throttle(3, 10)
   @Post('register')
   registerUser(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto.email);
     const user = this.userService.createUser(createUserDto);
 
     return instanceToPlain(user);

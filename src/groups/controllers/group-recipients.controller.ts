@@ -32,9 +32,9 @@ export class GroupRecipientsController {
   async addGroupRecipient(
     @AuthUser() { id: issuerId }: User,
     @Param('id', ParseIntPipe) groupId: number,
-    @Body() { email }: AddGroupRecipientDto,
+    @Body() { username }: AddGroupRecipientDto,
   ) {
-    const params: AddGroupRecipientParams = { issuerId, groupId, email };
+    const params: AddGroupRecipientParams = { issuerId, groupId, username };
     const response = await this.groupRecipientsService.addGroupRecipient(
       params,
     );

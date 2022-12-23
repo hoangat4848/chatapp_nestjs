@@ -14,20 +14,20 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export type CreateUserDetails = {
-  email: string;
+  username: string;
   firstName: string;
   lastName: string;
   password: string;
 };
 
 export type ValidateUsertDetails = {
-  email: string;
+  username: string;
   password: string;
 };
 
 export type FindUserParams = Partial<{
   id: number;
-  email: string;
+  username: string;
 }>;
 
 export type FindUserOptions = Partial<{
@@ -35,7 +35,7 @@ export type FindUserOptions = Partial<{
 }>;
 
 export type CreateConversationParams = {
-  email: string;
+  username: string;
   message?: string;
 };
 
@@ -117,7 +117,7 @@ export type EditGroupMessageParams = {
 export type AddGroupRecipientParams = {
   issuerId: number;
   groupId: number;
-  email: string;
+  username: string;
 };
 
 export type AddGroupUserReponse = {
@@ -164,7 +164,7 @@ export type GroupUserLeaveEventPayload = {
 
 export type CreateFriendRequestParams = {
   user: User;
-  email: string;
+  username: string;
 };
 
 export type FriendRequestStatus = 'accepted' | 'pending' | 'rejected';

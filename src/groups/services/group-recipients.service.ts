@@ -26,14 +26,14 @@ export class GroupRecipientsService implements IGroupRecipientsService {
   ) {}
 
   async addGroupRecipient(params: AddGroupRecipientParams) {
-    const { issuerId, groupId, email } = params;
+    const { issuerId, groupId, username } = params;
     const group = await this.groupsService.findGroupById(groupId);
     if (!group)
       throw new HttpException('Group Not Found', HttpStatus.BAD_REQUEST);
 
     if (group.owner.id !== issuerId) throw new NotGroupOwnerException();
 
-    const recipient = await this.usersService.findUser({ email });
+    const recipient = await this.usersService.findUser({ username });
     if (!recipient) throw new UserNotFoundException();
 
     const recipientInGroup = group.users.find(
