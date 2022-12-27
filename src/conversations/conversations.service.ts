@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { IMessagesService } from 'src/messages/messages';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
-import { IUsersService } from 'src/users/user';
+import { IUsersService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
 import { Conversation, User } from 'src/utils/typeorm';
 import { AccessParams, CreateConversationParams } from 'src/utils/types';
@@ -36,14 +36,14 @@ export class ConversationsService implements IConversationsService {
         'creator.id',
         'creator.firstName',
         'creator.lastName',
-        'creator.email',
+        'creator.username',
       ])
       .leftJoin('conversation.recipient', 'recipient')
       .addSelect([
         'recipient.id',
         'recipient.firstName',
         'recipient.lastName',
-        'recipient.email',
+        'recipient.username',
       ])
       .where('creator.id = :id', { id })
       .orWhere('recipient.id = :id', { id })

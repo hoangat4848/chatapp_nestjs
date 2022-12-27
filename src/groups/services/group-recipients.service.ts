@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { Inject } from '@nestjs/common/decorators/core/inject.decorator';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
-import { IUsersService } from 'src/users/user';
+import { IUsersService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
 import { Group } from 'src/utils/typeorm';
 import {

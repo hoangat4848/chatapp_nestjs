@@ -17,10 +17,13 @@ import { FriendsModule } from './friends/friends.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
 import { EventsModule } from './events/events.module';
 
+let envFilePath = '.env.development';
+if (process.env.ENVIRONMENT === 'PRODUCTION') envFilePath = '.env.production';
+
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
-    ConfigModule.forRoot({ envFilePath: '.env.development' }),
+    ConfigModule.forRoot({ envFilePath }),
     PassportModule.register({ session: true }),
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE,

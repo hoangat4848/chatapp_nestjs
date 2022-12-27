@@ -9,7 +9,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(Services.AUTH) private readonly authService: IAuthService,
   ) {
-    super({ usernameField: 'username' });
+    super();
   }
 
   async validate(username: string, password: string) {

@@ -5,12 +5,13 @@ import {
   HttpStatus,
   Inject,
   Post,
-  Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { instanceToPlain } from 'class-transformer';
-import { IUsersService } from 'src/users/user';
+import { IUsersService } from 'src/users/interfaces/user';
 import { Routes, Services } from 'src/utils/constants';
 import { IAuthService } from './auth';
 import { CreateUserDto } from './dtos/CreateUser.dto';
@@ -19,6 +20,7 @@ import { Response } from 'express';
 import { User } from 'src/utils/typeorm';
 import { AuthUser } from 'src/utils/decorators';
 import { Throttle } from '@nestjs/throttler';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -48,5 +50,12 @@ export class AuthController {
   @UseGuards(AuthenticatedGuard)
   async status(@AuthUser() user: User) {
     return user;
+  }
+
+  @Post('test')
+  @UseInterceptors(FileInterceptor('file', {}))
+  test(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+    return 'ok';
   }
 }

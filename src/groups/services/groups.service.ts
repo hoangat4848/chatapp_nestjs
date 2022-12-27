@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
-import { IUsersService } from 'src/users/user';
+import { IUsersService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
 import { Group } from 'src/utils/typeorm/entities/Group';
 import {

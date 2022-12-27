@@ -1,5 +1,6 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
+    ENVIRONMENT: string;
     PORT?: string;
     DB_TYPE?: 'mysql';
     MYSQL_DB_HOST?: string;

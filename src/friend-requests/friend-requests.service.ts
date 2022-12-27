@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IFriendsService } from 'src/friends/friends';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
-import { IUsersService } from 'src/users/user';
+import { IUsersService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
 import { Friend, FriendRequest } from 'src/utils/typeorm';
 import {

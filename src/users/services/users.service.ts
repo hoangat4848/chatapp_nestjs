@@ -7,7 +7,7 @@ import {
   FindUserOptions,
   FindUserParams,
 } from 'src/utils/types';
-import { IUsersService } from './user';
+import { IUsersService } from '../interfaces/user';
 import { hashPassword } from 'src/utils/helpers';
 
 @Injectable()
@@ -44,6 +44,9 @@ export class UsersService implements IUsersService {
     return this.userRepository.findOne({
       where: params,
       select: options?.selectAll ? selectionsWithPassword : selections,
+      relations: {
+        profile: true,
+      },
     });
   }
 
@@ -52,7 +55,7 @@ export class UsersService implements IUsersService {
   }
 
   async searchUsers(query: string): Promise<User[]> {
-    const searchStatement = '(user.email LIKE :query)';
+    const searchStatement = '(user.username LIKE :query)';
     return this.userRepository
       .createQueryBuilder('user')
       .where(searchStatement, { query: `%${query}%` })
@@ -61,7 +64,7 @@ export class UsersService implements IUsersService {
         'user.id',
         'user.firstName',
         'user.lastName',
-        'user.email',
+        'user.username',
         'user.profile',
       ])
       .getMany();

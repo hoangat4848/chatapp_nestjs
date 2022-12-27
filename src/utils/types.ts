@@ -198,3 +198,7 @@ export type RemoveFriendEventPayload = {
   friend: Friend;
   userId: number;
 };
+
+export type UpdateUserProfileParams = Partial<{
+  about: string;
+}>;
