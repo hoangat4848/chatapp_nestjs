@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Inject,
   Post,
+  Req,
   Res,
   UploadedFile,
   UseGuards,
@@ -21,6 +22,7 @@ import { User } from 'src/utils/typeorm';
 import { AuthUser } from 'src/utils/decorators';
 import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthenticatedRequest } from 'src/utils/types';
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -44,7 +46,12 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout() {}
+  @UseGuards(AuthenticatedGuard)
+  logout(@Req() req: AuthenticatedRequest, @Res() res: Response) {
+    req.logout((err) => {
+      return err ? res.send(HttpStatus.BAD_REQUEST) : res.send(HttpStatus.OK);
+    });
+  }
 
   @Get('status')
   @UseGuards(AuthenticatedGuard)

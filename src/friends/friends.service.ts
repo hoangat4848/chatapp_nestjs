@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Friend } from 'src/utils/typeorm';
+import { Friend, User } from 'src/utils/typeorm';
 import { DeleteFriendParams } from 'src/utils/types';
 import { Repository, TreeRepositoryUtils } from 'typeorm';
 import { DeleteFriendException } from './exceptions/DeleteFriend';

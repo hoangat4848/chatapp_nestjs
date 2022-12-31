@@ -1,4 +1,4 @@
-import { Friend } from 'src/utils/typeorm';
+import { Friend, User } from 'src/utils/typeorm';
 import { DeleteFriendParams } from 'src/utils/types';
 
 export interface IFriendsService {

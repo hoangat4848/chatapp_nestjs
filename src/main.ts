@@ -12,7 +12,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const { PORT, COOKIE_SECRET } = process.env;
+  const { PORT, COOKIE_SECRET, ENVIRONMENT } = process.env;
   const adapter = new WebsocketAdapter(app);
   app.useWebSocketAdapter(adapter);
 
@@ -44,7 +44,7 @@ async function bootstrap() {
   try {
     await app.listen(PORT, () => {
       console.log(`App is listening on port ${PORT}`);
-      console.log(`Running in ${process.env.ENVIRONMENT} mode..`);
+      console.log(`Running in ${ENVIRONMENT} mode..`);
     });
   } catch (error) {
     console.log(error);
