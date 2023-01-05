@@ -8,17 +8,26 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
-import { DeleteMessageParams, EditMessageParams } from 'src/utils/types';
+import {
+  Attachment,
+  CreateMessageParams,
+  DeleteMessageParams,
+  EditMessageParams,
+} from 'src/utils/types';
 import { CreateMessageDto } from './dtos/CreateMessage.dto';
 import { EditMessageDto } from './dtos/EditMessage.dto';
+import { EmptyMessageException } from './exceptions/EmptyMessage';
 import { IMessagesService } from './messages';
 
 @Controller(Routes.MESSAGES)
@@ -32,12 +41,28 @@ export class MessagesController {
 
   @Post()
   @Throttle(5, 10)
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      {
+        name: 'attachments',
+        maxCount: 5,
+      },
+    ]),
+  )
   async createMessage(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) conversationId: number,
+    @UploadedFiles() files: { attachments: Attachment[] },
     @Body() { content }: CreateMessageDto,
   ) {
-    const params = { user, conversationId, content };
+    if (!content && !files?.attachments) throw new EmptyMessageException();
+
+    const params: CreateMessageParams = {
+      user,
+      conversationId,
+      content,
+      attachments: files?.attachments ?? undefined,
+    };
     const response = await this.messagesService.createMessage(params);
     this.eventEmitter.emit('message.created', response);
     return response.message;

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ImageStorageModule } from 'src/image-storage/image-storage.module';
 import { Services } from 'src/utils/constants';
 import { Profile, User } from 'src/utils/typeorm';
 import { UserProfilesController } from './controllers/user-profiles.controller';
@@ -8,7 +9,7 @@ import { UserProfilesService } from './services/user-profiles.service';
 import { UsersService } from './services/users.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Profile])],
+  imports: [TypeOrmModule.forFeature([User, Profile]), ImageStorageModule],
   controllers: [UsersController, UserProfilesController],
   providers: [
     {

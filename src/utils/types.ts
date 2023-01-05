@@ -8,6 +8,7 @@ import {
   Message,
   User,
 } from './typeorm';
+import { MessageAttachment } from './typeorm/entities/MessageAttachment';
 
 export interface AuthenticatedRequest extends Request {
   user: User;
@@ -41,8 +42,9 @@ export type CreateConversationParams = {
 
 export type CreateMessageParams = {
   user: User;
-  content: string;
   conversationId: number;
+  content?: string;
+  attachments?: Attachment[];
 };
 
 export type CreateMessageResponse = {
@@ -201,4 +203,18 @@ export type RemoveFriendEventPayload = {
 
 export type UpdateUserProfileParams = Partial<{
   about: string;
+  banner: Express.Multer.File;
+  avatar: Express.Multer.File;
 }>;
+
+export type UserProfileFiles = Partial<{
+  banner: Express.Multer.File[];
+  avatar: Express.Multer.File[];
+}>;
+
+export interface Attachment extends Express.Multer.File {}
+
+export type UploadMessageAttachmentParams = {
+  file: Attachment;
+  messageAttachment: MessageAttachment;
+};

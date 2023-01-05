@@ -1,20 +1,16 @@
 import {
-  BaseEntity,
   Column,
   CreateDateColumn,
-  Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Conversation } from './Conversation';
-import { Group } from './Group';
 import { User } from './User';
 
 export abstract class BaseMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   content: string;
 
   @CreateDateColumn({ name: 'created_at' })

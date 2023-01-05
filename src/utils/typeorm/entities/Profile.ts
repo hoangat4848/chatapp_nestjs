@@ -9,6 +9,12 @@ export class Profile {
   @Column({ default: '' })
   about?: string;
 
+  @Column({ nullable: true })
+  avatar?: string;
+
+  @Column({ nullable: true })
+  banner?: string;
+
   @OneToOne(() => User)
   user: User;
 }

@@ -9,6 +9,7 @@ import { TypeormStore } from 'connect-typeorm/out';
 import { DataSource } from 'typeorm';
 import { WebsocketAdapter } from './gateway/gateway.adapter';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -16,11 +17,15 @@ async function bootstrap() {
   const adapter = new WebsocketAdapter(app);
   app.useWebSocketAdapter(adapter);
 
+  console.log(join(__dirname, '..', 'public'));
+
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    prefix: '/public/',
+  });
   app.enableCors({ origin: ['http://localhost:3000'], credentials: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-
   // console.log(AppDataSource.options);
   const sessionRepository = app.get(DataSource).getRepository(Session);
 

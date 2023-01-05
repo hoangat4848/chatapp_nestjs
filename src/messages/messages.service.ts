@@ -1,5 +1,7 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IMessageAttachmentsService } from 'src/message-attachments/message-attachments';
+import { Services } from 'src/utils/constants';
 import { Conversation, Message } from 'src/utils/typeorm';
 import {
   CreateMessageParams,
@@ -17,12 +19,14 @@ export class MessagesService implements IMessagesService {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(Conversation)
     private readonly conversationRepository: Repository<Conversation>,
+    @Inject(Services.MESSAGE_ATTACHMENTS)
+    private readonly messageAttachmentsService: IMessageAttachmentsService,
   ) {}
 
   async createMessage(
     params: CreateMessageParams,
   ): Promise<CreateMessageResponse> {
-    const { user, conversationId, content } = params;
+    const { user, conversationId, content, attachments } = params;
     const conversation = await this.conversationRepository.findOne({
       where: { id: conversationId },
       relations: ['creator', 'recipient', 'lastMessageSent'],
@@ -41,9 +45,12 @@ export class MessagesService implements IMessagesService {
     }
 
     const newMessage = await this.messageRepository.create({
-      content,
       conversation,
       author: user,
+      content,
+      attachments: attachments
+        ? await this.messageAttachmentsService.create(attachments)
+        : [],
     });
     const savedMessage = await this.messageRepository.save(newMessage);
 
@@ -64,7 +71,10 @@ export class MessagesService implements IMessagesService {
         createdAt: 'DESC',
       },
       relations: {
-        author: true,
+        author: {
+          profile: true,
+        },
+        attachments: true,
       },
       select: {
         author: {
