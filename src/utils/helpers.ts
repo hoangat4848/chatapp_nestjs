@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { NextFunction, Response } from 'express';
-import { AuthenticatedRequest } from './types';
+import { Attachment, AuthenticatedRequest } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import * as Sharp from 'sharp';
 
 export async function hashPassword(rawPassword: string) {
   const salt = await bcrypt.genSalt();
@@ -27,3 +28,6 @@ export function isAuthorized(
 }
 
 export const generateUUIDV4 = () => uuidv4() as string;
+
+export const compressImage = (attachment: Attachment) =>
+  Sharp(attachment.buffer).resize(300).jpeg().toBuffer();

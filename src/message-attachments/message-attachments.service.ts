@@ -26,8 +26,8 @@ export class MessageAttachmentsService implements IMessageAttachmentsService {
       });
       return this.messageAttachmentsRepository
         .save(newAttachment)
-        .then((newAttachment) => {
-          this.imageStorageService.saveImage(uniqueKey, attachment);
+        .then(async (newAttachment) => {
+          await this.imageStorageService.saveImage(uniqueKey, attachment);
           return newAttachment;
         });
     });

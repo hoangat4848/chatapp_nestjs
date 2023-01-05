@@ -35,24 +35,24 @@ export class UserProfilesService implements IUserProfilesService {
     if (banner) {
       user.profile?.banner &&
         this.imageStorageService.deleteImage(user.profile.banner);
-      user.profile.banner = this.updateBanner(banner);
+      user.profile.banner = await this.updateBanner(banner);
     }
     if (avatar) {
       user.profile?.avatar &&
         this.imageStorageService.deleteImage(user.profile.banner);
-      user.profile.avatar = this.updateAvatar(avatar);
+      user.profile.avatar = await this.updateAvatar(avatar);
     }
     return this.userRepository.save(user);
   }
 
   updateBanner(file: Express.Multer.File) {
     const key = generateUUIDV4();
-    return this.imageStorageService.saveImage(key, file);
+    return this.imageStorageService.saveCompressedImage(key, file);
   }
 
   updateAvatar(file: Express.Multer.File) {
     const key = generateUUIDV4();
-    return this.imageStorageService.saveImage(key, file);
+    return this.imageStorageService.saveCompressedImage(key, file);
   }
 
   async createProfileOrUpdate(
