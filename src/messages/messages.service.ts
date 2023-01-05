@@ -29,7 +29,13 @@ export class MessagesService implements IMessagesService {
     const { user, conversationId, content, attachments } = params;
     const conversation = await this.conversationRepository.findOne({
       where: { id: conversationId },
-      relations: ['creator', 'recipient', 'lastMessageSent'],
+      relations: [
+        'creator',
+        'recipient',
+        'lastMessageSent',
+        'creator.profile',
+        'recipient.profile',
+      ],
     });
     if (!conversation)
       throw new HttpException('Conversation not found', HttpStatus.BAD_REQUEST);

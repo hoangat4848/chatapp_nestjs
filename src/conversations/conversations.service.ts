@@ -55,8 +55,12 @@ export class ConversationsService implements IConversationsService {
     const conversation = await this.conversationRepository.findOne({
       where: { id },
       relations: {
-        creator: true,
-        recipient: true,
+        creator: {
+          profile: true,
+        },
+        recipient: {
+          profile: true,
+        },
         lastMessageSent: true,
       },
     });
