@@ -72,8 +72,12 @@ export class FriendRequestsService implements IFriendRequestsService {
         },
       ],
       relations: {
-        sender: true,
-        receiver: true,
+        sender: {
+          profile: true,
+        },
+        receiver: {
+          profile: true,
+        },
       },
     });
   }

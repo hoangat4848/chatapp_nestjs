@@ -25,8 +25,12 @@ export class FriendsService implements IFriendsService {
         },
       ],
       relations: {
-        sender: true,
-        receiver: true,
+        sender: {
+          profile: true,
+        },
+        receiver: {
+          profile: true,
+        },
       },
     });
   }

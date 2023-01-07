@@ -53,6 +53,7 @@ export class GroupsService implements IGroupsService {
       .leftJoinAndSelect('groups.lastMessageSent', 'lastMessageSent')
       .leftJoinAndSelect('groups.creator', 'creator')
       .leftJoinAndSelect('groups.owner', 'owner')
+      .leftJoinAndSelect('users.profile', 'usersProfile')
       .orderBy('groups.lastMessageSentAt', 'DESC')
       .getMany();
 
