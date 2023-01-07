@@ -67,7 +67,9 @@ export class GroupsService implements IGroupsService {
       relations: {
         creator: true,
         owner: true,
-        users: true,
+        users: {
+          profile: true,
+        },
         lastMessageSent: true,
       },
     });
