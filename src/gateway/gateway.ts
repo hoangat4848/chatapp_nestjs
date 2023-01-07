@@ -212,7 +212,7 @@ export class MessagingGateway
 
   @OnEvent('message.deleted')
   async handleMessageDeletedEvent(payload: DeleteMessageReponse) {
-    const conversation = await this.conversationsService.findConversationById(
+    const conversation = await this.conversationsService.findById(
       payload.conversationId,
     );
     if (!conversation) return;

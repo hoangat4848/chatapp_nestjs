@@ -218,3 +218,13 @@ export type UploadMessageAttachmentParams = {
   file: Attachment;
   messageAttachment: MessageAttachment;
 };
+
+export type GetConversationMessagesParams = {
+  conversationId: number;
+  limit: number;
+};
+
+export type UpdateConversationParams = {
+  conversationId: number;
+  lastMessageSent: Message;
+};

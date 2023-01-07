@@ -1,17 +1,15 @@
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IMessagesService } from 'src/messages/messages';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
 import { IUsersService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
-import { Conversation, User } from 'src/utils/typeorm';
-import { AccessParams, CreateConversationParams } from 'src/utils/types';
+import { Conversation, Message, User } from 'src/utils/typeorm';
+import {
+  AccessParams,
+  CreateConversationParams,
+  GetConversationMessagesParams,
+  UpdateConversationParams,
+} from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IConversationsService } from './conversations';
 import { ConversationNotFoundException } from './exceptions/ConversationNotFound';
@@ -21,10 +19,10 @@ export class ConversationsService implements IConversationsService {
   constructor(
     @InjectRepository(Conversation)
     private readonly conversationRepository: Repository<Conversation>,
+    @InjectRepository(Message)
+    private readonly messageRepository: Repository<Message>,
     @Inject(Services.USERS)
     private readonly usersService: IUsersService,
-    @Inject(Services.MESSAGES)
-    private readonly messagesService: IMessagesService,
   ) {}
 
   async getConversations(id: number): Promise<Conversation[]> {
@@ -51,7 +49,7 @@ export class ConversationsService implements IConversationsService {
       .getMany();
   }
 
-  async findConversationById(id: number): Promise<Conversation | undefined> {
+  async findById(id: number): Promise<Conversation | undefined> {
     const conversation = await this.conversationRepository.findOne({
       where: { id },
       relations: {
@@ -94,11 +92,13 @@ export class ConversationsService implements IConversationsService {
     );
 
     if (content) {
-      const { message: newMessage } = await this.messagesService.createMessage({
-        user,
+      const newMessage = this.messageRepository.create({
+        author: user,
         content,
-        conversationId: newConversation.id,
+        conversation,
       });
+
+      const savedMessage = await this.messageRepository.save(newMessage);
     }
 
     return newConversation;
@@ -107,7 +107,7 @@ export class ConversationsService implements IConversationsService {
   async hasAccess(params: AccessParams): Promise<boolean> {
     const { id: conversationId, userId } = params;
 
-    const conversation = await this.findConversationById(conversationId);
+    const conversation = await this.findById(conversationId);
     if (!conversation) throw new ConversationNotFoundException();
     return (
       conversation.creator.id === userId || conversation.recipient.id === userId
@@ -126,6 +126,31 @@ export class ConversationsService implements IConversationsService {
           recipient: { id: userId },
         },
       ],
+    });
+  }
+
+  save(conversation: Conversation): Promise<Conversation> {
+    return this.conversationRepository.save(conversation);
+  }
+
+  getMessages({
+    conversationId,
+    limit,
+  }: GetConversationMessagesParams): Promise<Conversation> {
+    return this.conversationRepository
+      .createQueryBuilder('conversation')
+      .where('id = :id', { id: conversationId })
+      .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
+      .leftJoinAndSelect('conversation.messages', 'message')
+      .where('conversation.id = :id', { id: conversationId })
+      .orderBy('message.createdAt', 'DESC')
+      .limit(limit)
+      .getOne();
+  }
+
+  update({ conversationId, lastMessageSent }: UpdateConversationParams) {
+    return this.conversationRepository.update(conversationId, {
+      lastMessageSent,
     });
   }
 }

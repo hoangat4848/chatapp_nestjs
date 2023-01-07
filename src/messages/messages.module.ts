@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConversationsModule } from 'src/conversations/conversations.module';
 import { MessageAttachmentsModule } from 'src/message-attachments/message-attachments.module';
 import { Services } from 'src/utils/constants';
 import { Conversation, Message } from 'src/utils/typeorm';
@@ -8,7 +9,8 @@ import { MessagesService } from './messages.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Message, Conversation]),
+    TypeOrmModule.forFeature([Message]),
+    ConversationsModule,
     MessageAttachmentsModule,
   ],
   controllers: [MessagesController],
