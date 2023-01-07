@@ -95,11 +95,7 @@ export class MessagesController {
       messageId,
     };
     await this.messagesService.deleteMessage(params);
-    this.eventEmitter.emit('message.deleted', {
-      userId: user.id,
-      messageId,
-      conversationId,
-    });
+    this.eventEmitter.emit('message.deleted', params);
     return { conversationId, messageId };
   }
 

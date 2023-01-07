@@ -34,4 +34,12 @@ export class MessageAttachmentsService implements IMessageAttachmentsService {
 
     return Promise.all(promises);
   }
+
+  async deleteAllAttachments(attachments: MessageAttachment[]) {
+    const promises = attachments.map((attachment) =>
+      this.messageAttachmentsRepository.delete(attachment.id),
+    );
+
+    return Promise.all(promises);
+  }
 }

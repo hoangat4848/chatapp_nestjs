@@ -10,7 +10,7 @@ export class MessageAttachment {
   key: string;
 
   @ManyToOne(() => Message, (message) => message.attachments, {
-    cascade: ['remove'],
+    onDelete: 'CASCADE',
   })
   message: Message;
 }
