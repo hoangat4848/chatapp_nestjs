@@ -9,15 +9,23 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { Patch } from '@nestjs/common/decorators';
+import {
+  Patch,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common/decorators';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { CreateMessageDto } from 'src/messages/dtos/CreateMessage.dto';
+import { EmptyMessageException } from 'src/messages/exceptions/EmptyMessage';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import {
+  Attachment,
+  CreateGroupMessageParams,
   DeleteGroupMessageParams,
   EditGroupMessageParams,
 } from 'src/utils/types';
@@ -35,17 +43,27 @@ export class GroupMessagesController {
 
   @Post()
   @Throttle(5, 10)
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      {
+        name: 'attachments',
+        maxCount: 5,
+      },
+    ]),
+  )
   async createGroupMessage(
     @AuthUser() user: User,
+    @UploadedFiles() { attachments }: { attachments: Attachment[] },
     @Param('id', ParseIntPipe) groupId: number,
-    @Body() createGroupMessageDto: CreateMessageDto,
+    @Body() { content }: CreateMessageDto,
   ) {
-    const params = {
+    if (!attachments && !content) throw new EmptyMessageException();
+    const params: CreateGroupMessageParams = {
       author: user,
       groupId,
-      ...createGroupMessageDto,
+      content,
+      attachments,
     };
-
     const response = await this.groupMessagesService.createGroupMessage(params);
     this.eventEmitter.emit('group.message.created', response);
 

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
+import { IMessageAttachmentsService } from 'src/message-attachments/message-attachments';
 import { Services } from 'src/utils/constants';
 import { Group, GroupMessage } from 'src/utils/typeorm';
 import {
@@ -22,10 +23,12 @@ export class GroupMessagesService implements IGroupMessagesService {
     private readonly groupRepository: Repository<Group>,
     @Inject(Services.GROUPS)
     private readonly groupService: IGroupsService,
+    @Inject(Services.MESSAGE_ATTACHMENTS)
+    private readonly messageAttachmentsService: IMessageAttachmentsService,
   ) {}
 
   async createGroupMessage(params: CreateGroupMessageParams) {
-    const { groupId, author, content } = params;
+    const { groupId, author, content, attachments } = params;
 
     const group = await this.groupService.findGroupById(groupId);
     if (!group)
@@ -38,6 +41,11 @@ export class GroupMessagesService implements IGroupMessagesService {
       author: instanceToPlain(author),
       content,
       group,
+      attachments: attachments
+        ? await this.messageAttachmentsService.createGroupAttachments(
+            attachments,
+          )
+        : [],
     });
     const savedMessage = await this.groupMessageRepository.save(
       newGroupMessage,
@@ -69,14 +77,10 @@ export class GroupMessagesService implements IGroupMessagesService {
         createdAt: 'DESC',
       },
       relations: {
-        author: true,
-      },
-      select: {
         author: {
-          id: true,
-          firstName: true,
-          lastName: true,
+          profile: true,
         },
+        attachments: true,
       },
     });
   }
