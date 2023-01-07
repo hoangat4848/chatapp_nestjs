@@ -12,7 +12,9 @@ import {
 } from 'src/utils/types';
 import { Repository } from 'typeorm';
 import { IConversationsService } from './conversations';
+import { ConversationExistsException } from './exceptions/ConversationExists';
 import { ConversationNotFoundException } from './exceptions/ConversationNotFound';
+import { CreateConversationException } from './exceptions/CreateConversation';
 
 @Injectable()
 export class ConversationsService implements IConversationsService {
@@ -73,14 +75,12 @@ export class ConversationsService implements IConversationsService {
     if (!recipient) throw new UserNotFoundException();
 
     if (user.id === recipient.id)
-      throw new HttpException(
-        'Cannot Create Conversation',
-        HttpStatus.BAD_REQUEST,
+      throw new CreateConversationException(
+        'Cannot create conversation with yourself',
       );
 
     const existingConversation = await this.isCreated(user.id, recipient.id);
-    if (existingConversation)
-      throw new HttpException('Conversation exists', HttpStatus.CONFLICT);
+    if (existingConversation) throw new ConversationExistsException();
 
     const conversation = this.conversationRepository.create({
       creator: user,
