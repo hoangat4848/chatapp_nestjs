@@ -229,3 +229,10 @@ export type UpdateConversationParams = {
   conversationId: number;
   lastMessageSent: Message;
 };
+
+export type UpdateGroupDetailsParams = {
+  userId: number;
+  groupId: number;
+  title?: string;
+  avatar?: Attachment;
+};

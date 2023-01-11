@@ -8,21 +8,27 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { SkipThrottle } from '@nestjs/throttler';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import {
+  Attachment,
   CreateGroupParams,
   FetchGroupParams,
   TransferGroupOwnerParams,
+  UpdateGroupDetailsParams,
 } from 'src/utils/types';
 import { CreateGroupDto } from '../dtos/CreateGroup.dto';
 import { TransferOwnerDto } from '../dtos/TransferGroupOwner.dto';
+import { UpdateGroupDetailsDto } from '../dtos/UpdateGroupDetails.dto';
 import { IGroupsService } from '../interfaces/groups';
 
 @SkipThrottle()
@@ -74,6 +80,24 @@ export class GroupsController {
     const updatedGroup = await this.groupsService.transferGroupOwner(params);
 
     this.eventEmitter.emit('group.owner.updated', updatedGroup);
+    return updatedGroup;
+  }
+
+  @Patch(':id/details')
+  @UseInterceptors(FileInterceptor('avatar'))
+  async updateGroupDetails(
+    @AuthUser() user: User,
+    @Param('id', ParseIntPipe) groupId: number,
+    @UploadedFile() avatar: Attachment,
+    @Body() { title }: UpdateGroupDetailsDto,
+  ) {
+    const params: UpdateGroupDetailsParams = {
+      userId: user.id,
+      groupId,
+      title,
+      avatar,
+    };
+    const updatedGroup = await this.groupsService.updateDetails(params);
     return updatedGroup;
   }
 }
