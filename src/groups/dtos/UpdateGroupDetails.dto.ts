@@ -1,7 +1,7 @@
-import { IsString, Length, MinLength } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateGroupDetailsDto {
   @IsString()
-  @MinLength(4)
+  @IsOptional()
   title?: string;
 }

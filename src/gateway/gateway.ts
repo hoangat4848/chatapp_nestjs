@@ -322,6 +322,17 @@ export class MessagingGateway
       .emit('onGroupOwnerUpdate', plainToInstance(Group, payload));
   }
 
+  @OnEvent('group.details.updated')
+  async handleGroupDetailsUpdate(payload: Group) {
+    const sockets = payload.users
+      .map((user) => this.sessionsService.getUserSocket(user.id))
+      .filter(Boolean);
+
+    sockets.forEach((socket) =>
+      socket.emit('onGroupDetailsUpdate', plainToInstance(Group, payload)),
+    );
+  }
+
   @OnEvent('group.user.leave')
   async handleGroupUserLeave(payload: GroupUserLeaveEventPayload) {
     const { group, userId } = payload;

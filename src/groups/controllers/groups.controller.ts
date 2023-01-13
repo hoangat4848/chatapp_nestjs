@@ -98,6 +98,7 @@ export class GroupsController {
       avatar,
     };
     const updatedGroup = await this.groupsService.updateDetails(params);
+    this.eventEmitter.emit('group.details.updated', updatedGroup);
     return updatedGroup;
   }
 }
