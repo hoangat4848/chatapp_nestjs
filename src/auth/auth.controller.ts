@@ -58,11 +58,4 @@ export class AuthController {
   async status(@AuthUser() user: User) {
     return user;
   }
-
-  @Post('test')
-  @UseInterceptors(FileInterceptor('file', {}))
-  test(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-    return 'ok';
-  }
 }
