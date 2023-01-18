@@ -19,8 +19,9 @@ import { EventsModule } from './events/events.module';
 import { ImageStorageModule } from './image-storage/image-storage.module';
 import { MessageAttachmentsModule } from './message-attachments/message-attachments.module';
 
-let envFilePath = '.env.development';
-if (process.env.ENVIRONMENT === 'PRODUCTION') envFilePath = '.env.production';
+// let envFilePath = '.env.development';
+// if (process.env.ENVIRONMENT === 'PRODUCTION') envFilePath = '.env.production';
+const envFilePath = '.env';
 
 @Module({
   imports: [
