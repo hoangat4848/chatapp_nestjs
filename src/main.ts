@@ -19,7 +19,7 @@ async function bootstrap() {
 
   const adapter = new WebsocketAdapter(app);
   app.useWebSocketAdapter(adapter);
-  app.enableCors({ origin: ['*'], credentials: true });
+  app.enableCors({ origin: true, credentials: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
