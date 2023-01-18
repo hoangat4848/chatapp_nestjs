@@ -33,8 +33,8 @@ export class UserProfilesService implements IUserProfilesService {
       user.profile.about = about;
     }
     if (banner) {
-      user.profile?.banner &&
-        this.imageStorageService.deleteImage(user.profile.banner);
+      // user.profile?.banner &&
+      //   this.imageStorageService.deleteImage(user.profile.banner);
       user.profile.banner = await this.updateBanner(banner);
     }
     if (avatar) {
@@ -47,12 +47,12 @@ export class UserProfilesService implements IUserProfilesService {
 
   updateBanner(file: Express.Multer.File) {
     const key = generateUUIDV4();
-    return this.imageStorageService.saveCompressedImage(key, file);
+    return this.imageStorageService.uploadImageCloudinary(file, key);
   }
 
   updateAvatar(file: Express.Multer.File) {
     const key = generateUUIDV4();
-    return this.imageStorageService.saveCompressedImage(key, file);
+    return this.imageStorageService.uploadImageCloudinary(file, key);
   }
 
   async createProfileOrUpdate(

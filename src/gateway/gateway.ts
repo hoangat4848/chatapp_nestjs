@@ -34,7 +34,6 @@ import {
   RemoveGroupUserReponse,
 } from 'src/utils/types';
 import { IGatewaySession } from './gateway.session';
-
 @WebSocketGateway({
   cors: {
     origin: ['http://localhost:3000'],

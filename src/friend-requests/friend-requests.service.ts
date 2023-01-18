@@ -86,7 +86,6 @@ export class FriendRequestsService implements IFriendRequestsService {
     params: AcceptFriendRequestParams,
   ): Promise<AcceptFriendRequestResponse> {
     const { id, userId } = params;
-    console.log('ahoi');
 
     const friendRequest = await this.findById(id);
     if (!friendRequest) throw new FriendRequestNotFoundException();

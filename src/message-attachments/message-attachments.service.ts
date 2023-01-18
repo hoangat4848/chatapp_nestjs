@@ -43,15 +43,13 @@ export class MessageAttachmentsService implements IMessageAttachmentsService {
   ): Promise<GroupMessageAttachment[]> {
     const promises = attachments.map((attachment) => {
       const uniqueKey = generateUUIDV4();
-      const newAttachment = this.groupMessageAttachmentsRepository.create({
-        key: uniqueKey + extname(attachment.originalname),
-      });
-      return this.groupMessageAttachmentsRepository
-        .save(newAttachment)
-        .then(async (newAttachment) => {
-          await this.imageStorageService.saveImage(uniqueKey, attachment);
-          return newAttachment;
-        });
+      return this.imageStorageService
+        .uploadImageCloudinary(attachment, uniqueKey)
+        .then((url) =>
+          this.groupMessageAttachmentsRepository.create({
+            key: url,
+          }),
+        );
     });
 
     return Promise.all(promises);

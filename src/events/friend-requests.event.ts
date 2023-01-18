@@ -18,11 +18,9 @@ export class FriendRequestsEvents {
 
   @OnEvent('friend.request.created')
   handleFriendRequestCreatedEvent(payload: FriendRequest) {
-    console.log('friend request created');
     const receiverSocket = this.gatewaySessionsService.getUserSocket(
       payload.receiver.id,
     );
-    console.log(receiverSocket?.id);
     if (receiverSocket)
       receiverSocket.emit(
         'onFriendRequestReceived',

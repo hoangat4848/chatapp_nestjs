@@ -9,5 +9,8 @@ declare namespace NodeJS {
     MYSQL_DB_PORT?: string;
     MYSQL_DB_DATABASE?: string;
     COOKIE_SECRET?: string;
+    CLOUDINARY_CLOUD_NAME?: string;
+    CLOUDINARY_API_KEY?: string;
+    CLOUDINARY_API_SECRET?: string;
   }
 }

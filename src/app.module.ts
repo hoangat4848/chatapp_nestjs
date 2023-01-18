@@ -16,8 +16,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { FriendsModule } from './friends/friends.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
 import { EventsModule } from './events/events.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { ImageStorageModule } from './image-storage/image-storage.module';
 import { MessageAttachmentsModule } from './message-attachments/message-attachments.module';
 
@@ -27,7 +25,7 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') envFilePath = '.env.production';
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
-    ConfigModule.forRoot({ envFilePath }),
+    ConfigModule.forRoot({ envFilePath, isGlobal: true }),
     PassportModule.register({ session: true }),
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE,

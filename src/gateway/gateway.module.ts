@@ -5,7 +5,6 @@ import { GroupsModule } from 'src/groups/groups.module';
 import { Services } from 'src/utils/constants';
 import { MessagingGateway } from './gateway';
 import { GatewaySessionManager } from './gateway.session';
-
 @Module({
   imports: [ConversationsModule, GroupsModule, FriendsModule],
   providers: [

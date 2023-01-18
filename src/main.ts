@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import { config } from 'dotenv';
+config();
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -14,15 +16,10 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const { PORT, COOKIE_SECRET, ENVIRONMENT } = process.env;
+
   const adapter = new WebsocketAdapter(app);
   app.useWebSocketAdapter(adapter);
-
-  console.log(join(__dirname, '..', 'public'));
-
-  app.useStaticAssets(join(__dirname, '..', 'public'), {
-    prefix: '/public/',
-  });
-  app.enableCors({ origin: ['http://localhost:3000'], credentials: true });
+  app.enableCors({ origin: ['*'], credentials: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));

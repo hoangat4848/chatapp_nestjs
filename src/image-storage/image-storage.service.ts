@@ -1,12 +1,36 @@
-import { Injectable } from '@nestjs/common';
-import { exists, existsSync, unlink, unlinkSync, writeFileSync } from 'fs';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { existsSync, unlinkSync, writeFileSync } from 'fs';
 import { extname, join } from 'path';
-import * as crypto from 'crypto';
 import { IImageStorageService } from './image-storage';
 import { compressImage } from 'src/utils/helpers';
+import { v2 } from 'cloudinary';
+const toStream = require('buffer-to-stream');
 
 @Injectable()
 export class ImageStorageService implements IImageStorageService {
+  async uploadImageCloudinary(
+    file: Express.Multer.File,
+    key?: string,
+  ): Promise<string> {
+    const compressedImage = await compressImage(file);
+    console.log(key);
+
+    return new Promise((resolve, reject) => {
+      const upload = v2.uploader.upload_stream(
+        { folder: 'chatapp', filename_override: key },
+        (error, result) => {
+          if (error)
+            throw new HttpException(
+              'Error when uploading images. Try again',
+              HttpStatus.BAD_REQUEST,
+            );
+          resolve(result.url);
+        },
+      );
+      toStream(compressedImage).pipe(upload);
+    });
+  }
+
   async saveImage(
     imageName: string,
     file: Express.Multer.File,
